@@ -23,9 +23,9 @@ import { formatDate, getProjectName, type Task } from "@/lib/mock-data";
 interface TaskListProps {
   tasks: Task[];
   onOpen: (task: Task) => void;
-  onDelete?: (task: Task) => void;
-  showCreated?: boolean;
-  showProject?: boolean;
+  onDelete?: ((task: Task) => void) | undefined;
+  showCreated?: boolean | undefined;
+  showProject?: boolean | undefined;
 }
 
 function RowActions({ task, onOpen, onDelete }: Omit<TaskListProps, "tasks"> & { task: Task }) {
