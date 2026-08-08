@@ -9,159 +9,331 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as CalendarRouteImport } from './routes/calendar'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as TasksRouteImport } from './routes/tasks'
-import { Route as ProjectsIndexRouteImport } from './routes/projects/index'
-import { Route as ProjectsProjectIdRouteImport } from './routes/projects/$projectId'
+import { Route as PublicRouteImport } from './routes/_public'
+import { Route as PublicIndexRouteImport } from './routes/_public.index'
+import { Route as PublicAboutRouteImport } from './routes/_public.about'
+import { Route as PublicCategoriesRouteImport } from './routes/_public.categories'
+import { Route as PublicLoginRouteImport } from './routes/_public.login'
+import { Route as PublicOrdersRouteImport } from './routes/_public.orders'
+import { Route as PublicProfileRouteImport } from './routes/_public.profile'
+import { Route as PublicSignupRouteImport } from './routes/_public.signup'
+import { Route as PublicTicketsRouteImport } from './routes/_public.tickets'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as OrganizerIndexRouteImport } from './routes/organizer.index'
+import { Route as PublicEventsIndexRouteImport } from './routes/_public.events.index'
+import { Route as PublicEventsEventIdRouteImport } from './routes/_public.events.$eventId'
+import { Route as OrganizerEventsNewRouteImport } from './routes/organizer.events.new'
 
-const IndexRoute = IndexRouteImport.update({
+const PublicRoute = PublicRouteImport.update({
+  id: '/_public',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicIndexRoute = PublicIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicAboutRoute = PublicAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicCategoriesRoute = PublicCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicLoginRoute = PublicLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicOrdersRoute = PublicOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicProfileRoute = PublicProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicSignupRoute = PublicSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicTicketsRoute = PublicTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => PublicRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CalendarRoute = CalendarRouteImport.update({
-  id: '/calendar',
-  path: '/calendar',
+const OrganizerIndexRoute = OrganizerIndexRouteImport.update({
+  id: '/organizer/',
+  path: '/organizer/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
+const PublicEventsIndexRoute = PublicEventsIndexRouteImport.update({
+  id: '/events/',
+  path: '/events/',
+  getParentRoute: () => PublicRoute,
 } as any)
-const TasksRoute = TasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
-  getParentRoute: () => rootRouteImport,
+const PublicEventsEventIdRoute = PublicEventsEventIdRouteImport.update({
+  id: '/events/$eventId',
+  path: '/events/$eventId',
+  getParentRoute: () => PublicRoute,
 } as any)
-const ProjectsIndexRoute = ProjectsIndexRouteImport.update({
-  id: '/projects/',
-  path: '/projects/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProjectsProjectIdRoute = ProjectsProjectIdRouteImport.update({
-  id: '/projects/$projectId',
-  path: '/projects/$projectId',
+const OrganizerEventsNewRoute = OrganizerEventsNewRouteImport.update({
+  id: '/organizer/events/new',
+  path: '/organizer/events/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/calendar': typeof CalendarRoute
-  '/settings': typeof SettingsRoute
-  '/tasks': typeof TasksRoute
-  '/projects/$projectId': typeof ProjectsProjectIdRoute
-  '/projects/': typeof ProjectsIndexRoute
+  '/': typeof PublicIndexRoute
+  '/about': typeof PublicAboutRoute
+  '/categories': typeof PublicCategoriesRoute
+  '/login': typeof PublicLoginRoute
+  '/orders': typeof PublicOrdersRoute
+  '/profile': typeof PublicProfileRoute
+  '/signup': typeof PublicSignupRoute
+  '/tickets': typeof PublicTicketsRoute
+  '/admin/': typeof AdminIndexRoute
+  '/organizer/': typeof OrganizerIndexRoute
+  '/events/$eventId': typeof PublicEventsEventIdRoute
+  '/organizer/events/new': typeof OrganizerEventsNewRoute
+  '/events/': typeof PublicEventsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/calendar': typeof CalendarRoute
-  '/settings': typeof SettingsRoute
-  '/tasks': typeof TasksRoute
-  '/projects/$projectId': typeof ProjectsProjectIdRoute
-  '/projects': typeof ProjectsIndexRoute
+  '/about': typeof PublicAboutRoute
+  '/categories': typeof PublicCategoriesRoute
+  '/login': typeof PublicLoginRoute
+  '/orders': typeof PublicOrdersRoute
+  '/profile': typeof PublicProfileRoute
+  '/signup': typeof PublicSignupRoute
+  '/tickets': typeof PublicTicketsRoute
+  '/': typeof PublicIndexRoute
+  '/admin': typeof AdminIndexRoute
+  '/organizer': typeof OrganizerIndexRoute
+  '/events/$eventId': typeof PublicEventsEventIdRoute
+  '/organizer/events/new': typeof OrganizerEventsNewRoute
+  '/events': typeof PublicEventsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/calendar': typeof CalendarRoute
-  '/settings': typeof SettingsRoute
-  '/tasks': typeof TasksRoute
-  '/projects/$projectId': typeof ProjectsProjectIdRoute
-  '/projects/': typeof ProjectsIndexRoute
+  '/_public': typeof PublicRouteWithChildren
+  '/_public/about': typeof PublicAboutRoute
+  '/_public/categories': typeof PublicCategoriesRoute
+  '/_public/login': typeof PublicLoginRoute
+  '/_public/orders': typeof PublicOrdersRoute
+  '/_public/profile': typeof PublicProfileRoute
+  '/_public/signup': typeof PublicSignupRoute
+  '/_public/tickets': typeof PublicTicketsRoute
+  '/_public/': typeof PublicIndexRoute
+  '/admin/': typeof AdminIndexRoute
+  '/organizer/': typeof OrganizerIndexRoute
+  '/_public/events/$eventId': typeof PublicEventsEventIdRoute
+  '/organizer/events/new': typeof OrganizerEventsNewRoute
+  '/_public/events/': typeof PublicEventsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/calendar'
-    | '/settings'
-    | '/tasks'
-    | '/projects/$projectId'
-    | '/projects/'
+    | '/about'
+    | '/categories'
+    | '/login'
+    | '/orders'
+    | '/profile'
+    | '/signup'
+    | '/tickets'
+    | '/admin/'
+    | '/organizer/'
+    | '/events/$eventId'
+    | '/organizer/events/new'
+    | '/events/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/about'
+    | '/categories'
+    | '/login'
+    | '/orders'
+    | '/profile'
+    | '/signup'
+    | '/tickets'
     | '/'
-    | '/calendar'
-    | '/settings'
-    | '/tasks'
-    | '/projects/$projectId'
-    | '/projects'
+    | '/admin'
+    | '/organizer'
+    | '/events/$eventId'
+    | '/organizer/events/new'
+    | '/events'
   id:
     | '__root__'
-    | '/'
-    | '/calendar'
-    | '/settings'
-    | '/tasks'
-    | '/projects/$projectId'
-    | '/projects/'
+    | '/_public'
+    | '/_public/about'
+    | '/_public/categories'
+    | '/_public/login'
+    | '/_public/orders'
+    | '/_public/profile'
+    | '/_public/signup'
+    | '/_public/tickets'
+    | '/_public/'
+    | '/admin/'
+    | '/organizer/'
+    | '/_public/events/$eventId'
+    | '/organizer/events/new'
+    | '/_public/events/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  CalendarRoute: typeof CalendarRoute
-  SettingsRoute: typeof SettingsRoute
-  TasksRoute: typeof TasksRoute
-  ProjectsProjectIdRoute: typeof ProjectsProjectIdRoute
-  ProjectsIndexRoute: typeof ProjectsIndexRoute
+  PublicRoute: typeof PublicRouteWithChildren
+  AdminIndexRoute: typeof AdminIndexRoute
+  OrganizerIndexRoute: typeof OrganizerIndexRoute
+  OrganizerEventsNewRoute: typeof OrganizerEventsNewRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_public': {
+      id: '/_public'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof PublicRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_public/': {
+      id: '/_public/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof PublicIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/about': {
+      id: '/_public/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof PublicAboutRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/categories': {
+      id: '/_public/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof PublicCategoriesRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/login': {
+      id: '/_public/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof PublicLoginRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/orders': {
+      id: '/_public/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof PublicOrdersRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/profile': {
+      id: '/_public/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof PublicProfileRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/signup': {
+      id: '/_public/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof PublicSignupRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/tickets': {
+      id: '/_public/tickets'
+      path: '/tickets'
+      fullPath: '/tickets'
+      preLoaderRoute: typeof PublicTicketsRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/calendar': {
-      id: '/calendar'
-      path: '/calendar'
-      fullPath: '/calendar'
-      preLoaderRoute: typeof CalendarRouteImport
+    '/organizer/': {
+      id: '/organizer/'
+      path: '/organizer'
+      fullPath: '/organizer/'
+      preLoaderRoute: typeof OrganizerIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_public/events/': {
+      id: '/_public/events/'
+      path: '/events'
+      fullPath: '/events/'
+      preLoaderRoute: typeof PublicEventsIndexRouteImport
+      parentRoute: typeof PublicRoute
     }
-    '/tasks': {
-      id: '/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof TasksRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_public/events/$eventId': {
+      id: '/_public/events/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof PublicEventsEventIdRouteImport
+      parentRoute: typeof PublicRoute
     }
-    '/projects/': {
-      id: '/projects/'
-      path: '/projects'
-      fullPath: '/projects/'
-      preLoaderRoute: typeof ProjectsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/projects/$projectId': {
-      id: '/projects/$projectId'
-      path: '/projects/$projectId'
-      fullPath: '/projects/$projectId'
-      preLoaderRoute: typeof ProjectsProjectIdRouteImport
+    '/organizer/events/new': {
+      id: '/organizer/events/new'
+      path: '/organizer/events/new'
+      fullPath: '/organizer/events/new'
+      preLoaderRoute: typeof OrganizerEventsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
 }
 
+interface PublicRouteChildren {
+  PublicAboutRoute: typeof PublicAboutRoute
+  PublicCategoriesRoute: typeof PublicCategoriesRoute
+  PublicLoginRoute: typeof PublicLoginRoute
+  PublicOrdersRoute: typeof PublicOrdersRoute
+  PublicProfileRoute: typeof PublicProfileRoute
+  PublicSignupRoute: typeof PublicSignupRoute
+  PublicTicketsRoute: typeof PublicTicketsRoute
+  PublicIndexRoute: typeof PublicIndexRoute
+  PublicEventsEventIdRoute: typeof PublicEventsEventIdRoute
+  PublicEventsIndexRoute: typeof PublicEventsIndexRoute
+}
+
+const PublicRouteChildren: PublicRouteChildren = {
+  PublicAboutRoute: PublicAboutRoute,
+  PublicCategoriesRoute: PublicCategoriesRoute,
+  PublicLoginRoute: PublicLoginRoute,
+  PublicOrdersRoute: PublicOrdersRoute,
+  PublicProfileRoute: PublicProfileRoute,
+  PublicSignupRoute: PublicSignupRoute,
+  PublicTicketsRoute: PublicTicketsRoute,
+  PublicIndexRoute: PublicIndexRoute,
+  PublicEventsEventIdRoute: PublicEventsEventIdRoute,
+  PublicEventsIndexRoute: PublicEventsIndexRoute,
+}
+
+const PublicRouteWithChildren =
+  PublicRoute._addFileChildren(PublicRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  CalendarRoute: CalendarRoute,
-  SettingsRoute: SettingsRoute,
-  TasksRoute: TasksRoute,
-  ProjectsProjectIdRoute: ProjectsProjectIdRoute,
-  ProjectsIndexRoute: ProjectsIndexRoute,
+  PublicRoute: PublicRouteWithChildren,
+  AdminIndexRoute: AdminIndexRoute,
+  OrganizerIndexRoute: OrganizerIndexRoute,
+  OrganizerEventsNewRoute: OrganizerEventsNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
