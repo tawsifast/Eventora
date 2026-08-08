@@ -13,7 +13,13 @@ import { Route as PublicRouteImport } from './routes/_public'
 import { Route as PublicIndexRouteImport } from './routes/_public.index'
 import { Route as PublicAboutRouteImport } from './routes/_public.about'
 import { Route as PublicCategoriesRouteImport } from './routes/_public.categories'
+import { Route as PublicLoginRouteImport } from './routes/_public.login'
+import { Route as PublicOrdersRouteImport } from './routes/_public.orders'
+import { Route as PublicProfileRouteImport } from './routes/_public.profile'
+import { Route as PublicSignupRouteImport } from './routes/_public.signup'
+import { Route as PublicTicketsRouteImport } from './routes/_public.tickets'
 import { Route as PublicEventsIndexRouteImport } from './routes/_public.events.index'
+import { Route as PublicEventsEventIdRouteImport } from './routes/_public.events.$eventId'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -34,9 +40,39 @@ const PublicCategoriesRoute = PublicCategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => PublicRoute,
 } as any)
+const PublicLoginRoute = PublicLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicOrdersRoute = PublicOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicProfileRoute = PublicProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicSignupRoute = PublicSignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicTicketsRoute = PublicTicketsRouteImport.update({
+  id: '/tickets',
+  path: '/tickets',
+  getParentRoute: () => PublicRoute,
+} as any)
 const PublicEventsIndexRoute = PublicEventsIndexRouteImport.update({
   id: '/events/',
   path: '/events/',
+  getParentRoute: () => PublicRoute,
+} as any)
+const PublicEventsEventIdRoute = PublicEventsEventIdRouteImport.update({
+  id: '/events/$eventId',
+  path: '/events/$eventId',
   getParentRoute: () => PublicRoute,
 } as any)
 
@@ -44,12 +80,24 @@ export interface FileRoutesByFullPath {
   '/': typeof PublicIndexRoute
   '/about': typeof PublicAboutRoute
   '/categories': typeof PublicCategoriesRoute
+  '/login': typeof PublicLoginRoute
+  '/orders': typeof PublicOrdersRoute
+  '/profile': typeof PublicProfileRoute
+  '/signup': typeof PublicSignupRoute
+  '/tickets': typeof PublicTicketsRoute
+  '/events/$eventId': typeof PublicEventsEventIdRoute
   '/events/': typeof PublicEventsIndexRoute
 }
 export interface FileRoutesByTo {
   '/about': typeof PublicAboutRoute
   '/categories': typeof PublicCategoriesRoute
+  '/login': typeof PublicLoginRoute
+  '/orders': typeof PublicOrdersRoute
+  '/profile': typeof PublicProfileRoute
+  '/signup': typeof PublicSignupRoute
+  '/tickets': typeof PublicTicketsRoute
   '/': typeof PublicIndexRoute
+  '/events/$eventId': typeof PublicEventsEventIdRoute
   '/events': typeof PublicEventsIndexRoute
 }
 export interface FileRoutesById {
@@ -57,20 +105,52 @@ export interface FileRoutesById {
   '/_public': typeof PublicRouteWithChildren
   '/_public/about': typeof PublicAboutRoute
   '/_public/categories': typeof PublicCategoriesRoute
+  '/_public/login': typeof PublicLoginRoute
+  '/_public/orders': typeof PublicOrdersRoute
+  '/_public/profile': typeof PublicProfileRoute
+  '/_public/signup': typeof PublicSignupRoute
+  '/_public/tickets': typeof PublicTicketsRoute
   '/_public/': typeof PublicIndexRoute
+  '/_public/events/$eventId': typeof PublicEventsEventIdRoute
   '/_public/events/': typeof PublicEventsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/categories' | '/events/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/categories'
+    | '/login'
+    | '/orders'
+    | '/profile'
+    | '/signup'
+    | '/tickets'
+    | '/events/$eventId'
+    | '/events/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/about' | '/categories' | '/' | '/events'
+  to:
+    | '/about'
+    | '/categories'
+    | '/login'
+    | '/orders'
+    | '/profile'
+    | '/signup'
+    | '/tickets'
+    | '/'
+    | '/events/$eventId'
+    | '/events'
   id:
     | '__root__'
     | '/_public'
     | '/_public/about'
     | '/_public/categories'
+    | '/_public/login'
+    | '/_public/orders'
+    | '/_public/profile'
+    | '/_public/signup'
+    | '/_public/tickets'
     | '/_public/'
+    | '/_public/events/$eventId'
     | '/_public/events/'
   fileRoutesById: FileRoutesById
 }
@@ -108,11 +188,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicCategoriesRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/_public/login': {
+      id: '/_public/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof PublicLoginRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/orders': {
+      id: '/_public/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof PublicOrdersRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/profile': {
+      id: '/_public/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof PublicProfileRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/signup': {
+      id: '/_public/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof PublicSignupRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/tickets': {
+      id: '/_public/tickets'
+      path: '/tickets'
+      fullPath: '/tickets'
+      preLoaderRoute: typeof PublicTicketsRouteImport
+      parentRoute: typeof PublicRoute
+    }
     '/_public/events/': {
       id: '/_public/events/'
       path: '/events'
       fullPath: '/events/'
       preLoaderRoute: typeof PublicEventsIndexRouteImport
+      parentRoute: typeof PublicRoute
+    }
+    '/_public/events/$eventId': {
+      id: '/_public/events/$eventId'
+      path: '/events/$eventId'
+      fullPath: '/events/$eventId'
+      preLoaderRoute: typeof PublicEventsEventIdRouteImport
       parentRoute: typeof PublicRoute
     }
   }
@@ -121,14 +243,26 @@ declare module '@tanstack/react-router' {
 interface PublicRouteChildren {
   PublicAboutRoute: typeof PublicAboutRoute
   PublicCategoriesRoute: typeof PublicCategoriesRoute
+  PublicLoginRoute: typeof PublicLoginRoute
+  PublicOrdersRoute: typeof PublicOrdersRoute
+  PublicProfileRoute: typeof PublicProfileRoute
+  PublicSignupRoute: typeof PublicSignupRoute
+  PublicTicketsRoute: typeof PublicTicketsRoute
   PublicIndexRoute: typeof PublicIndexRoute
+  PublicEventsEventIdRoute: typeof PublicEventsEventIdRoute
   PublicEventsIndexRoute: typeof PublicEventsIndexRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
   PublicAboutRoute: PublicAboutRoute,
   PublicCategoriesRoute: PublicCategoriesRoute,
+  PublicLoginRoute: PublicLoginRoute,
+  PublicOrdersRoute: PublicOrdersRoute,
+  PublicProfileRoute: PublicProfileRoute,
+  PublicSignupRoute: PublicSignupRoute,
+  PublicTicketsRoute: PublicTicketsRoute,
   PublicIndexRoute: PublicIndexRoute,
+  PublicEventsEventIdRoute: PublicEventsEventIdRoute,
   PublicEventsIndexRoute: PublicEventsIndexRoute,
 }
 
