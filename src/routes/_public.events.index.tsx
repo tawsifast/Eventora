@@ -22,14 +22,14 @@ import { events } from "@/data/events";
 import type { EventStatus } from "@/types";
 
 interface ExploreSearch {
-  q?: string;
-  category?: string;
+  q?: string | undefined;
+  category?: string | undefined;
 }
 
-export const Route = createFileRoute("/_public/events")({
+export const Route = createFileRoute("/_public/events/")({
   validateSearch: (search: Record<string, unknown>): ExploreSearch => ({
-    q: typeof search.q === "string" ? search.q : undefined,
-    category: typeof search.category === "string" ? search.category : undefined,
+    q: typeof search["q"] === "string" ? (search["q"] as string) : undefined,
+    category: typeof search["category"] === "string" ? (search["category"] as string) : undefined,
   }),
   head: () => ({
     meta: [
