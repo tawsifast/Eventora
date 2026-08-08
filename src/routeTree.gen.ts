@@ -18,8 +18,11 @@ import { Route as PublicOrdersRouteImport } from './routes/_public.orders'
 import { Route as PublicProfileRouteImport } from './routes/_public.profile'
 import { Route as PublicSignupRouteImport } from './routes/_public.signup'
 import { Route as PublicTicketsRouteImport } from './routes/_public.tickets'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as OrganizerIndexRouteImport } from './routes/organizer.index'
 import { Route as PublicEventsIndexRouteImport } from './routes/_public.events.index'
 import { Route as PublicEventsEventIdRouteImport } from './routes/_public.events.$eventId'
+import { Route as OrganizerEventsNewRouteImport } from './routes/organizer.events.new'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -65,6 +68,16 @@ const PublicTicketsRoute = PublicTicketsRouteImport.update({
   path: '/tickets',
   getParentRoute: () => PublicRoute,
 } as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrganizerIndexRoute = OrganizerIndexRouteImport.update({
+  id: '/organizer/',
+  path: '/organizer/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PublicEventsIndexRoute = PublicEventsIndexRouteImport.update({
   id: '/events/',
   path: '/events/',
@@ -74,6 +87,11 @@ const PublicEventsEventIdRoute = PublicEventsEventIdRouteImport.update({
   id: '/events/$eventId',
   path: '/events/$eventId',
   getParentRoute: () => PublicRoute,
+} as any)
+const OrganizerEventsNewRoute = OrganizerEventsNewRouteImport.update({
+  id: '/organizer/events/new',
+  path: '/organizer/events/new',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -85,7 +103,10 @@ export interface FileRoutesByFullPath {
   '/profile': typeof PublicProfileRoute
   '/signup': typeof PublicSignupRoute
   '/tickets': typeof PublicTicketsRoute
+  '/admin/': typeof AdminIndexRoute
+  '/organizer/': typeof OrganizerIndexRoute
   '/events/$eventId': typeof PublicEventsEventIdRoute
+  '/organizer/events/new': typeof OrganizerEventsNewRoute
   '/events/': typeof PublicEventsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -97,7 +118,10 @@ export interface FileRoutesByTo {
   '/signup': typeof PublicSignupRoute
   '/tickets': typeof PublicTicketsRoute
   '/': typeof PublicIndexRoute
+  '/admin': typeof AdminIndexRoute
+  '/organizer': typeof OrganizerIndexRoute
   '/events/$eventId': typeof PublicEventsEventIdRoute
+  '/organizer/events/new': typeof OrganizerEventsNewRoute
   '/events': typeof PublicEventsIndexRoute
 }
 export interface FileRoutesById {
@@ -111,7 +135,10 @@ export interface FileRoutesById {
   '/_public/signup': typeof PublicSignupRoute
   '/_public/tickets': typeof PublicTicketsRoute
   '/_public/': typeof PublicIndexRoute
+  '/admin/': typeof AdminIndexRoute
+  '/organizer/': typeof OrganizerIndexRoute
   '/_public/events/$eventId': typeof PublicEventsEventIdRoute
+  '/organizer/events/new': typeof OrganizerEventsNewRoute
   '/_public/events/': typeof PublicEventsIndexRoute
 }
 export interface FileRouteTypes {
@@ -125,7 +152,10 @@ export interface FileRouteTypes {
     | '/profile'
     | '/signup'
     | '/tickets'
+    | '/admin/'
+    | '/organizer/'
     | '/events/$eventId'
+    | '/organizer/events/new'
     | '/events/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -137,7 +167,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/tickets'
     | '/'
+    | '/admin'
+    | '/organizer'
     | '/events/$eventId'
+    | '/organizer/events/new'
     | '/events'
   id:
     | '__root__'
@@ -150,12 +183,18 @@ export interface FileRouteTypes {
     | '/_public/signup'
     | '/_public/tickets'
     | '/_public/'
+    | '/admin/'
+    | '/organizer/'
     | '/_public/events/$eventId'
+    | '/organizer/events/new'
     | '/_public/events/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   PublicRoute: typeof PublicRouteWithChildren
+  AdminIndexRoute: typeof AdminIndexRoute
+  OrganizerIndexRoute: typeof OrganizerIndexRoute
+  OrganizerEventsNewRoute: typeof OrganizerEventsNewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -223,6 +262,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicTicketsRouteImport
       parentRoute: typeof PublicRoute
     }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/organizer/': {
+      id: '/organizer/'
+      path: '/organizer'
+      fullPath: '/organizer/'
+      preLoaderRoute: typeof OrganizerIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_public/events/': {
       id: '/_public/events/'
       path: '/events'
@@ -236,6 +289,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/events/$eventId'
       preLoaderRoute: typeof PublicEventsEventIdRouteImport
       parentRoute: typeof PublicRoute
+    }
+    '/organizer/events/new': {
+      id: '/organizer/events/new'
+      path: '/organizer/events/new'
+      fullPath: '/organizer/events/new'
+      preLoaderRoute: typeof OrganizerEventsNewRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -271,6 +331,9 @@ const PublicRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   PublicRoute: PublicRouteWithChildren,
+  AdminIndexRoute: AdminIndexRoute,
+  OrganizerIndexRoute: OrganizerIndexRoute,
+  OrganizerEventsNewRoute: OrganizerEventsNewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
