@@ -1,9 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CalendarDays, DollarSign, Ticket, Users } from "lucide-react";
+import { CalendarDays, DollarSign, LayoutDashboard, Ticket, Users } from "lucide-react";
 
 import { DashboardShell } from "@/components/dashboard-shell";
 import { PageHeader } from "@/components/section-heading";
 import { StatCard } from "@/components/stat-card";
+
+const navItems = [
+  { label: "Overview", to: "/admin", icon: LayoutDashboard, exact: true },
+];
 
 export const Route = createFileRoute("/admin/")({
   head: () => ({
@@ -19,14 +23,14 @@ export const Route = createFileRoute("/admin/")({
 
 function AdminPage() {
   return (
-    <DashboardShell>
+    <DashboardShell label="Admin" items={navItems}>
       <div className="space-y-8">
         <PageHeader title="Admin Overview" subtitle="Platform health at a glance." />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard icon={CalendarDays} label="Total events" value="268" change="+14 this month" />
-          <StatCard icon={Users} label="Organizers" value="72" change="+5 pending review" />
-          <StatCard icon={Ticket} label="Tickets sold" value="94,120" change="+3.2k this week" />
-          <StatCard icon={DollarSign} label="Gross revenue" value="$2.4M" change="+11%" />
+          <StatCard icon={CalendarDays} label="Total events" value="268" hint="+14 this month" />
+          <StatCard icon={Users} label="Organizers" value="72" hint="+5 pending review" />
+          <StatCard icon={Ticket} label="Tickets sold" value="94,120" hint="+3.2k this week" />
+          <StatCard icon={DollarSign} label="Gross revenue" value="$2.4M" hint="+11%" />
         </div>
       </div>
     </DashboardShell>

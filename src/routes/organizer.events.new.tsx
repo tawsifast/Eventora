@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { CalendarPlus, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
 
 import { DashboardShell } from "@/components/dashboard-shell";
@@ -9,6 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { categories } from "@/data/categories";
+
+const navItems = [
+  { label: "Overview", to: "/organizer", icon: LayoutDashboard, exact: true },
+  { label: "Create event", to: "/organizer/events/new", icon: CalendarPlus },
+];
 
 export const Route = createFileRoute("/organizer/events/new")({
   head: () => ({
@@ -24,7 +30,7 @@ export const Route = createFileRoute("/organizer/events/new")({
 
 function CreateEventPage() {
   return (
-    <DashboardShell>
+    <DashboardShell label="Organizer" items={navItems}>
       <div className="mx-auto max-w-2xl space-y-8">
         <PageHeader title="Create an Event" subtitle="Basics now, details later — you can edit anytime." />
         <form
