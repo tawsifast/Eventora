@@ -1,6 +1,5 @@
 import type { LucideIcon } from "lucide-react";
 
-import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 export function StatCard({
@@ -17,17 +16,23 @@ export function StatCard({
   className?: string;
 }) {
   return (
-    <Card className={cn("border-border shadow-[var(--shadow-card)]", className)}>
-      <CardContent className="flex items-start justify-between gap-4 p-5">
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">{label}</p>
-          <p className="text-2xl font-semibold tracking-tight sm:text-3xl">{value}</p>
+    <div
+      className={cn(
+        "group relative overflow-hidden rounded-2xl border border-border bg-card p-5 transition-colors hover:border-primary/40",
+        className,
+      )}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 space-y-1.5">
+          <p className="eyebrow truncate">{label}</p>
+          <p className="font-display text-3xl leading-none sm:text-4xl">{value}</p>
           {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
         </div>
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <Icon className="size-5" />
+        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
+          <Icon className="size-4.5" />
         </span>
-      </CardContent>
-    </Card>
+      </div>
+      <span className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary/60 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+    </div>
   );
 }
