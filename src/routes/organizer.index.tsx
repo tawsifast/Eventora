@@ -38,8 +38,7 @@ export const Route = createFileRoute("/organizer/")({
 });
 
 function OrganizerDashboard() {
-  const myEvents = getEventsByOrganizer("org_1");
-  const events = myEvents.length ? myEvents : getEventsByOrganizer("u_4");
+  const events = getEventsByOrganizer("u_1");
   const ticketsSold = events.reduce((s, e) => s + e.ticketsSold, 0);
   const revenue = events.reduce((s, e) => s + e.ticketsSold * e.price, 0);
   const capacity = events.reduce((s, e) => s + e.capacity, 0);
