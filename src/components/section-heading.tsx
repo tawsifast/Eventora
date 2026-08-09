@@ -1,59 +1,59 @@
-import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
-
 import { cn } from "@/lib/utils";
 
 export function SectionHeading({
+  eyebrow,
   title,
   subtitle,
   action,
   className,
-  align = "left",
 }: {
+  eyebrow?: string;
   title: string;
   subtitle?: string;
-  action?: ReactNode;
+  action?: React.ReactNode;
   className?: string;
-  align?: "left" | "center";
 }) {
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",
-        align === "center" && "sm:flex-col sm:items-center sm:text-center",
+        "grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:flex sm:flex-wrap sm:justify-between",
         className,
       )}
     >
-      <div className="max-w-2xl space-y-2">
-        <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
-        {subtitle && <p className="text-muted-foreground">{subtitle}</p>}
+      <div className="min-w-0 space-y-2">
+        {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
+        <h2 className="text-3xl leading-tight sm:text-4xl">{title}</h2>
+        {subtitle ? <p className="max-w-xl text-sm text-muted-foreground sm:text-base">{subtitle}</p> : null}
       </div>
-      {action}
+      {action ? <div className="shrink-0">{action}</div> : null}
     </div>
   );
 }
 
 export function PageHeader({
+  eyebrow,
   title,
   subtitle,
-  icon: Icon,
   action,
+  className,
 }: {
+  eyebrow?: string;
   title: string;
   subtitle?: string;
-  icon?: LucideIcon;
-  action?: ReactNode;
+  action?: React.ReactNode;
+  className?: string;
 }) {
   return (
-    <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-center sm:justify-between">
-      <div className="space-y-1.5">
-        <h1 className="flex items-center gap-2.5 text-2xl font-semibold tracking-tight sm:text-3xl">
-          {Icon && <Icon className="size-6 text-primary" />}
-          {title}
-        </h1>
-        {subtitle && <p className="text-sm text-muted-foreground sm:text-base">{subtitle}</p>}
+    <div className={cn("space-y-5", className)}>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:flex sm:flex-wrap sm:justify-between">
+        <div className="min-w-0 space-y-2">
+          <p className="eyebrow">{eyebrow ?? "EventHub"}</p>
+          <h1 className="text-4xl leading-[1.05] sm:text-5xl">{title}</h1>
+          {subtitle ? <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">{subtitle}</p> : null}
+        </div>
+        {action ? <div className="shrink-0">{action}</div> : null}
       </div>
-      {action}
+      <div className="rule-gold" />
     </div>
   );
 }
