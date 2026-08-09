@@ -25,6 +25,7 @@ import { getCategoryName } from "@/data/categories";
 import { events, getUpcomingEvents } from "@/data/events";
 import { getReviewsByEvent } from "@/data/reviews";
 import { EventCard } from "@/components/event-card";
+import type { ScheduleItem, TicketTier } from "@/types";
 import {
   calcServiceFee,
   formatCurrency,
@@ -88,7 +89,7 @@ function EventDetailPage() {
 
   const [tierId, setTierId] = useState(event.tiers[0]?.id ?? "");
   const [qty, setQty] = useState(1);
-  const tier = event.tiers.find((t) => t.id === tierId) ?? event.tiers[0];
+  const tier = event.tiers.find((t: TicketTier) => t.id === tierId) ?? event.tiers[0];
   const subtotal = (tier?.price ?? event.price) * qty;
   const fee = calcServiceFee(subtotal);
 
@@ -175,7 +176,7 @@ function EventDetailPage() {
               <div className="rounded-2xl border border-border bg-card p-6">
                 <p className="eyebrow">Ticket tiers</p>
                 <div className="mt-4 grid gap-3">
-                  {event.tiers.map((t) => (
+                  {event.tiers.map((t: TicketTier) => (
                     <div key={t.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3 last:border-0 last:pb-0">
                       <div className="min-w-0">
                         <p className="font-medium">{t.name}</p>
@@ -190,7 +191,7 @@ function EventDetailPage() {
 
             <TabsContent value="schedule" className="pt-8">
               <ol className="relative space-y-6 border-l border-border pl-6">
-                {event.schedule.map((item) => (
+                {event.schedule.map((item: ScheduleItem) => (
                   <li key={item.id} className="relative">
                     <span className="absolute -left-[1.9rem] top-1.5 size-2.5 rounded-full bg-primary" />
                     <p className="font-mono text-xs tracking-wider text-primary">{item.time}</p>
@@ -254,7 +255,7 @@ function EventDetailPage() {
                           <p className="text-xs text-muted-foreground">{formatRelative(r.createdAt)}</p>
                         </div>
                         <div className="ml-auto shrink-0">
-                          <StarRating rating={r.rating} size="sm" />
+                          <StarRating rating={r.rating} size={12} />
                         </div>
                       </div>
                       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{r.comment}</p>
@@ -280,7 +281,7 @@ function EventDetailPage() {
 
             <div className="space-y-2">
               <p className="text-sm font-medium">Choose a tier</p>
-              {event.tiers.map((t) => (
+              {event.tiers.map((t: TicketTier) => (
                 <button
                   key={t.id}
                   type="button"
