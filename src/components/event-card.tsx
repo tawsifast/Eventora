@@ -1,4 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
+import Image from "next/image";
 import { ArrowUpRight, Clock, MapPin, Ticket } from "lucide-react";
 
 import { CategoryBadge, EventStatusBadge } from "@/components/status-badges";
@@ -20,17 +21,15 @@ export function EventCard({ event, className }: { event: Event; className?: stri
       )}
     >
       <Link
-        to="/events/$eventId"
-        params={{ eventId: event.slug }}
+        href={`/events/${event.slug}`}
         className="relative block aspect-[16/11] overflow-hidden"
       >
-        <img
+        <Image
           src={event.imageUrl}
           alt={event.title}
-          loading="lazy"
-          width={1280}
-          height={880}
-          className="size-full object-cover saturate-[0.9] transition-transform duration-700 group-hover:scale-[1.06]"
+          fill
+          sizes="(min-width:1024px) 25vw, (min-width:640px) 50vw, 100vw"
+          className="object-cover saturate-[0.9] transition-transform duration-700 group-hover:scale-[1.06]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-card via-card/25 to-transparent" />
         <div className="absolute inset-x-4 top-4 flex items-start justify-between gap-2">
@@ -49,8 +48,7 @@ export function EventCard({ event, className }: { event: Event; className?: stri
         <div className="space-y-2">
           <h3 className="text-2xl leading-tight">
             <Link
-              to="/events/$eventId"
-              params={{ eventId: event.slug }}
+              href={`/events/${event.slug}`}
               className="transition-colors hover:text-primary"
             >
               {event.title}
@@ -83,7 +81,7 @@ export function EventCard({ event, className }: { event: Event; className?: stri
             )}
           </p>
           <Button asChild size="sm" variant="secondary" className="group/btn">
-            <Link to="/events/$eventId" params={{ eventId: event.slug }}>
+            <Link href={`/events/${event.slug}`}>
               View
               <ArrowUpRight className="size-4 transition-transform group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5" />
             </Link>
@@ -98,17 +96,15 @@ export function CompactEventCard({ event }: { event: Event }) {
   return (
     <article className="group flex gap-4 rounded-2xl border border-border bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-elevated)]">
       <Link
-        to="/events/$eventId"
-        params={{ eventId: event.slug }}
+        href={`/events/${event.slug}`}
         className="relative size-24 shrink-0 overflow-hidden rounded-xl sm:size-28"
       >
-        <img
+        <Image
           src={event.imageUrl}
           alt={event.title}
-          loading="lazy"
-          width={1280}
-          height={832}
-          className="size-full object-cover transition-transform duration-700 group-hover:scale-105"
+          fill
+          sizes="128px"
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
         />
       </Link>
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
@@ -116,7 +112,7 @@ export function CompactEventCard({ event }: { event: Event }) {
           {formatDate(event.date)} · {getCategoryName(event.categorySlug)}
         </p>
         <h3 className="truncate text-xl leading-tight">
-          <Link to="/events/$eventId" params={{ eventId: event.slug }} className="hover:text-primary">
+          <Link href={`/events/${event.slug}`} className="hover:text-primary">
             {event.title}
           </Link>
         </h3>
@@ -129,7 +125,7 @@ export function CompactEventCard({ event }: { event: Event }) {
             {event.price === 0 ? "Free" : formatCurrency(event.price)}
           </span>
           <Button asChild variant="ghost" size="sm">
-            <Link to="/events/$eventId" params={{ eventId: event.slug }}>
+            <Link href={`/events/${event.slug}`}>
               Get Tickets
             </Link>
           </Button>

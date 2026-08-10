@@ -1,33 +1,70 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, type ReactNode } from "react";
 
-import { currentUser } from "@/data/users";
-import type { User } from "@/types";
+import { authClient } from "@/lib/auth-client";
+import type { User, UserRole } from "@/types";
 
 /**
- * Mock session context. No persistence, no storage — purely UI state so the
- * navigation can demonstrate signed-in and signed-out experiences. This will be
- * replaced by a real JWT session hook once the backend exists.
+ * Real session context backed by Better Auth. The auth server lives in this
+ * Next.js app (src/app/api/auth/[...all]) and persists sessions to Postgres,
+ * so login/logout state survives page refreshes.
  */
 interface AuthContextValue {
   user: User | null;
   isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
+  isPending: boolean;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function initialsFromName(name: string): string {
+  return (
+    name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? "")
+      .join("") || "U"
+  );
+}
+
+function toDomainUser(u: {
+  id: string;
+  name: string;
+  email: string;
+  image?: string | null;
+  joinedAt?: Date;
+  createdAt: Date;
+  role?: string | null;
+}): User {
+  const role: UserRole = u.role === "organizer" || u.role === "admin" ? u.role : "user";
+  return {
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    role,
+    status: "active",
+    initials: initialsFromName(u.name),
+    avatarUrl: u.image ?? undefined,
+    joinedAt: (u.joinedAt ?? u.createdAt).toISOString().slice(0, 10),
+  };
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(currentUser);
+  const { data, isPending } = authClient.useSession();
+
+  const user = data?.user ? toDomainUser(data.user) : null;
 
   const value = useMemo<AuthContextValue>(
     () => ({
       user,
       isAuthenticated: user !== null,
-      login: () => setUser(currentUser),
-      logout: () => setUser(null),
+      isPending,
+      logout: async () => {
+        await authClient.signOut();
+      },
     }),
-    [user],
+    [user, isPending],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

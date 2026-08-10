@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 
 import { EventHubLogo } from "@/components/site-header";
 import { categories } from "@/data/categories";
@@ -19,17 +19,17 @@ export function SiteFooter() {
           <p className="text-sm font-semibold">Discover</p>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>
-              <Link to="/events" className="hover:text-foreground">
+              <Link href="/events" className="hover:text-foreground">
                 Explore Events
               </Link>
             </li>
             <li>
-              <Link to="/categories" className="hover:text-foreground">
+              <Link href="/categories" className="hover:text-foreground">
                 Categories
               </Link>
             </li>
             <li>
-              <Link to="/about" className="hover:text-foreground">
+              <Link href="/about" className="hover:text-foreground">
                 About EventHub
               </Link>
             </li>
@@ -41,7 +41,7 @@ export function SiteFooter() {
           <ul className="space-y-2 text-sm text-muted-foreground">
             {categories.slice(0, 4).map((c) => (
               <li key={c.id}>
-                <Link to="/events" search={{ category: c.slug }} className="hover:text-foreground">
+                <Link href={`/events?category=${c.slug}`} className="hover:text-foreground">
                   {c.name}
                 </Link>
               </li>
@@ -53,17 +53,17 @@ export function SiteFooter() {
           <p className="text-sm font-semibold">For organizers</p>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>
-              <Link to="/organizer" className="hover:text-foreground">
+              <Link href="/organizer" className="hover:text-foreground">
                 Organizer Dashboard
               </Link>
             </li>
             <li>
-              <Link to="/organizer/events/new" className="hover:text-foreground">
+              <Link href="/organizer/events/new" className="hover:text-foreground">
                 Create an Event
               </Link>
             </li>
             <li>
-              <Link to="/admin" className="hover:text-foreground">
+              <Link href="/admin" className="hover:text-foreground">
                 Administration
               </Link>
             </li>

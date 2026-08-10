@@ -1,8 +1,11 @@
-import { Link, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, LogOut, Menu, Search, Ticket, TicketCheck, User2, Sparkles } from "lucide-react";
+"use client";
+
+import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
+import { LayoutDashboard, LogOut, Menu, Search, ShieldCheck, Ticket, TicketCheck, User2, Sparkles } from "lucide-react";
 import { useState } from "react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,7 +29,7 @@ const navLinks = [
 
 export function EventHubLogo({ className }: { className?: string }) {
   return (
-    <Link to="/" className={cn("flex items-center gap-2", className)}>
+    <Link href="/" className={cn("flex items-center gap-2", className)}>
       <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
         <Sparkles className="size-4" />
       </span>
@@ -40,11 +43,12 @@ export function SiteHeader() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
+  const pathname = usePathname();
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
-    navigate({ to: "/events", search: { q: query || undefined } });
+    router.push(query.trim() ? `/events?q=${encodeURIComponent(query.trim())}` : "/events");
     setSearchOpen(false);
     setMobileOpen(false);
   }
@@ -58,11 +62,11 @@ export function SiteHeader() {
           {navLinks.map((link) => (
             <Link
               key={link.to}
-              to={link.to}
-              activeOptions={{ exact: link.to === "/" }}
-              activeProps={{ className: "text-foreground bg-accent" }}
-              inactiveProps={{ className: "text-muted-foreground" }}
-              className="rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground"
+              href={link.to}
+              className={cn(
+                "rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-foreground",
+                pathname === link.to ? "text-foreground bg-accent" : "text-muted-foreground",
+              )}
             >
               {link.label}
             </Link>
@@ -97,7 +101,7 @@ export function SiteHeader() {
           {isAuthenticated && user ? (
             <>
               <Button asChild variant="ghost" className="hidden md:inline-flex">
-                <Link to="/tickets">
+                <Link href="/tickets">
                   <Ticket className="size-4" />
                   My Tickets
                 </Link>
@@ -109,6 +113,7 @@ export function SiteHeader() {
                     aria-label="Account menu"
                   >
                     <Avatar className="size-9 border border-border">
+                      {user.avatarUrl ? <AvatarImage src={user.avatarUrl} alt={user.name} /> : null}
                       <AvatarFallback className="bg-primary/10 text-sm font-semibold text-primary">
                         {user.initials}
                       </AvatarFallback>
@@ -122,25 +127,34 @@ export function SiteHeader() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to="/profile">
+                    <Link href="/profile">
                       <User2 className="size-4" /> Profile
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/tickets">
+                    <Link href="/tickets">
                       <Ticket className="size-4" /> My Tickets
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link to="/orders">
+                    <Link href="/orders">
                       <TicketCheck className="size-4" /> My Orders
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/organizer">
-                      <LayoutDashboard className="size-4" /> Organizer Dashboard
-                    </Link>
-                  </DropdownMenuItem>
+                  {user.role === "organizer" || user.role === "admin" ? (
+                    <DropdownMenuItem asChild>
+                      <Link href="/organizer">
+                        <LayoutDashboard className="size-4" /> Organizer Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : null}
+                  {user.role === "admin" ? (
+                    <DropdownMenuItem asChild>
+                      <Link href="/admin">
+                        <ShieldCheck className="size-4" /> Admin Panel
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : null}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout}>
                     <LogOut className="size-4" /> Logout
@@ -151,10 +165,10 @@ export function SiteHeader() {
           ) : (
             <div className="hidden items-center gap-2 md:flex">
               <Button asChild variant="ghost">
-                <Link to="/login">Login</Link>
+                <Link href="/login">Login</Link>
               </Button>
               <Button asChild>
-                <Link to="/signup">Sign Up</Link>
+                <Link href="/signup">Sign Up</Link>
               </Button>
             </div>
           )}
@@ -184,11 +198,12 @@ export function SiteHeader() {
                   {navLinks.map((link) => (
                     <Link
                       key={link.to}
-                      to={link.to}
+                      href={link.to}
                       onClick={() => setMobileOpen(false)}
-                      activeOptions={{ exact: link.to === "/" }}
-                      activeProps={{ className: "bg-accent text-foreground" }}
-                      className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                      className={cn(
+                        "rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+                        pathname === link.to && "bg-accent text-foreground",
+                      )}
                     >
                       {link.label}
                     </Link>
@@ -201,12 +216,14 @@ export function SiteHeader() {
                         { to: "/tickets", label: "My Tickets" },
                         { to: "/orders", label: "My Orders" },
                         { to: "/profile", label: "Profile" },
-                        { to: "/organizer", label: "Organizer Dashboard" },
-                        { to: "/admin", label: "Admin" },
+                        ...(user?.role === "organizer" || user?.role === "admin"
+                          ? [{ to: "/organizer", label: "Organizer Dashboard" }]
+                          : []),
+                        ...(user?.role === "admin" ? [{ to: "/admin", label: "Admin" }] : []),
                       ].map((item) => (
                         <Link
                           key={item.to}
-                          to={item.to}
+                          href={item.to}
                           onClick={() => setMobileOpen(false)}
                           className="rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
                         >
@@ -227,12 +244,12 @@ export function SiteHeader() {
                   ) : (
                     <>
                       <Button asChild variant="outline">
-                        <Link to="/login" onClick={() => setMobileOpen(false)}>
+                        <Link href="/login" onClick={() => setMobileOpen(false)}>
                           Login
                         </Link>
                       </Button>
                       <Button asChild>
-                        <Link to="/signup" onClick={() => setMobileOpen(false)}>
+                        <Link href="/signup" onClick={() => setMobileOpen(false)}>
                           Sign Up
                         </Link>
                       </Button>

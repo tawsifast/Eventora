@@ -39,7 +39,7 @@ export const events: Event[] = [
     shortDescription: "Two days of product, platform and engineering talks from South Asia's fastest teams.",
     description:
       "Dhaka Tech Summit returns for its fifth edition with a sharper focus on shipping. Expect deep-dive keynotes on platform engineering, live product teardowns, a hiring floor with 40+ teams, and hallway conversations that usually turn into your next role or co-founder. Sessions are grouped into three tracks so you can follow engineering, product or growth end to end.",
-    imageUrl: techSummit,
+    imageUrl: techSummit.src,
     categorySlug: "technology",
     organizerId: "u_1",
     organizerName: "EventHub Studio",
@@ -73,7 +73,7 @@ export const events: Event[] = [
     shortDescription: "Three stages, twenty artists and one long sunset by the bay.",
     description:
       "The coast's biggest independent music weekend. Folk, indie rock and electronic acts rotate across three stages until midnight, with food trucks, art installations and a dedicated acoustic tent for quieter sets. Bring a light jacket — the sea breeze arrives around 9pm.",
-    imageUrl: musicFestival,
+    imageUrl: musicFestival.src,
     categorySlug: "music",
     organizerId: "u_4",
     organizerName: "Stagecraft Collective",
@@ -106,7 +106,7 @@ export const events: Event[] = [
     shortDescription: "Researchers and builders on where applied AI actually works today.",
     description:
       "A single-track conference with no vendor pitches. Twelve speakers present real deployments — evaluation harnesses, retrieval systems, safety reviews and the unglamorous data work behind them. The afternoon is reserved for open office hours with every speaker.",
-    imageUrl: aiConference,
+    imageUrl: aiConference.src,
     categorySlug: "technology",
     organizerId: "u_1",
     organizerName: "EventHub Studio",
@@ -139,7 +139,7 @@ export const events: Event[] = [
     shortDescription: "An unpolished evening of founder stories, numbers included.",
     description:
       "Every month four founders share one slide, one metric and one mistake. No pitch decks, no panels — just twenty minutes each and a long open floor afterwards. Capped at 120 seats so conversations stay real.",
-    imageUrl: foundersMeetup,
+    imageUrl: foundersMeetup.src,
     categorySlug: "business",
     organizerId: "u_1",
     organizerName: "EventHub Studio",
@@ -171,7 +171,7 @@ export const events: Event[] = [
     shortDescription: "A hands-on day building a paid and organic funnel that pays for itself.",
     description:
       "Bring a laptop and one real product. You will leave with an audience map, three tested ad angles, a landing page outline and a measurement plan you can defend. Twenty seats only, with one facilitator per five participants.",
-    imageUrl: marketingWorkshop,
+    imageUrl: marketingWorkshop.src,
     categorySlug: "workshop",
     organizerId: "u_8",
     organizerName: "Studio Ninetyfive",
@@ -203,7 +203,7 @@ export const events: Event[] = [
     shortDescription: "A curated print exhibition with portfolio reviews all weekend.",
     description:
       "Ninety photographers, four hundred prints and a print-sales floor supporting emerging artists. Book a fifteen-minute portfolio review with a working editor, or join the darkroom demonstrations running hourly.",
-    imageUrl: photographyExpo,
+    imageUrl: photographyExpo.src,
     categorySlug: "arts",
     organizerId: "u_8",
     organizerName: "Studio Ninetyfive",
@@ -235,7 +235,7 @@ export const events: Event[] = [
     shortDescription: "Sixty kitchens, one street, from kebab to bakarkhani.",
     description:
       "A walking food festival through the old quarter. One wristband covers tastings at sixty participating kitchens, with heritage walks leaving every half hour and a live qawwali stage after sunset.",
-    imageUrl: foodCarnival,
+    imageUrl: foodCarnival.src,
     categorySlug: "food",
     organizerId: "u_4",
     organizerName: "Stagecraft Collective",
@@ -267,7 +267,7 @@ export const events: Event[] = [
     shortDescription: "Floodlit knockout finals with four city sides.",
     description:
       "Two semi-finals and a final under lights across a single evening. Stands open two hours early with a fan zone, nets and commentary booth tours.",
-    imageUrl: cricketCup,
+    imageUrl: cricketCup.src,
     categorySlug: "sports",
     organizerId: "u_4",
     organizerName: "Stagecraft Collective",
@@ -299,7 +299,7 @@ export const events: Event[] = [
     shortDescription: "An evening lecture on type systems for screens.",
     description:
       "A focused two-hour lecture on building type scales, pairing families and testing for readability across devices, followed by a critique of participant work.",
-    imageUrl: marketingWorkshop,
+    imageUrl: marketingWorkshop.src,
     categorySlug: "education",
     organizerId: "u_8",
     organizerName: "Studio Ninetyfive",
@@ -330,7 +330,7 @@ export const events: Event[] = [
     shortDescription: "A flat 21km along the Buriganga at dawn.",
     description:
       "Chip-timed half marathon and 10km fun run with water stations every three kilometres, a pacer group for every finish target and breakfast at the finish arch.",
-    imageUrl: cricketCup,
+    imageUrl: cricketCup.src,
     categorySlug: "sports",
     organizerId: "u_4",
     organizerName: "Stagecraft Collective",
@@ -362,7 +362,7 @@ export const events: Event[] = [
     shortDescription: "Four indie acts, one rooftop, strictly 200 people.",
     description:
       "An intimate rooftop showcase for new indie acts with a proper sound rig and no support-act filler. Doors close once capacity is reached.",
-    imageUrl: musicFestival,
+    imageUrl: musicFestival.src,
     categorySlug: "music",
     organizerId: "u_1",
     organizerName: "EventHub Studio",
@@ -394,7 +394,7 @@ export const events: Event[] = [
     shortDescription: "Handmade craft market — cancelled due to venue works.",
     description:
       "The winter edition of our handmade craft market has been cancelled while the venue completes structural work. All ticket holders were refunded automatically.",
-    imageUrl: photographyExpo,
+    imageUrl: photographyExpo.src,
     categorySlug: "arts",
     organizerId: "u_8",
     organizerName: "Studio Ninetyfive",

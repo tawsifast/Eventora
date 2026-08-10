@@ -1,29 +1,39 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { ArrowLeft, Menu, type LucideIcon } from "lucide-react";
+"use client";
+
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft, CalendarPlus, LayoutDashboard, Menu, type LucideIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
 import { EventHubLogo } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
+const navIcons: Record<string, LucideIcon> = {
+  "layout-dashboard": LayoutDashboard,
+  "calendar-plus": CalendarPlus,
+};
+
 export interface DashboardNavItem {
   label: string;
   to: string;
-  icon: LucideIcon;
+  icon: string;
   exact?: boolean;
 }
 
 function NavList({ items, onNavigate }: { items: DashboardNavItem[]; onNavigate?: () => void }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const pathname = usePathname();
+  const Icon = (key: string) => navIcons[key] ?? Menu;
 
   return (
     <nav className="grid gap-1">
       {items.map((item) => {
         const active = item.exact ? pathname === item.to : pathname.startsWith(item.to);
+        const ItemIcon = Icon(item.icon);
         return (
           <Link
             key={item.to}
-            to={item.to}
+            href={item.to}
             onClick={onNavigate}
             className={`flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
               active
@@ -31,7 +41,7 @@ function NavList({ items, onNavigate }: { items: DashboardNavItem[]; onNavigate?
                 : "text-muted-foreground hover:bg-accent hover:text-foreground"
             }`}
           >
-            <item.icon className="size-4" />
+            <ItemIcon className="size-4" />
             {item.label}
           </Link>
         );
@@ -60,7 +70,7 @@ export function DashboardShell({
           <NavList items={items} />
         </div>
         <Button asChild variant="ghost" className="justify-start text-muted-foreground">
-          <Link to="/">
+          <Link href="/">
             <ArrowLeft className="size-4" /> Back to EventHub
           </Link>
         </Button>
@@ -86,7 +96,7 @@ export function DashboardShell({
                 </p>
                 <NavList items={items} onNavigate={() => setOpen(false)} />
                 <Button asChild variant="ghost" className="mt-4 w-full justify-start text-muted-foreground">
-                  <Link to="/" onClick={() => setOpen(false)}>
+                  <Link href="/" onClick={() => setOpen(false)}>
                     <ArrowLeft className="size-4" /> Back to EventHub
                   </Link>
                 </Button>

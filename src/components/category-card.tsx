@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 import {
   Briefcase,
   Cpu,
@@ -30,8 +30,7 @@ export function CategoryCard({ category }: { category: Category }) {
 
   return (
     <Link
-      to="/events"
-      search={{ category: category.slug }}
+      href={`/events?category=${category.slug}`}
       className="group flex flex-col gap-3 rounded-2xl border border-border bg-card p-5 shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[var(--shadow-elevated)]"
     >
       <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
