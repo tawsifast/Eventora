@@ -1,7 +1,7 @@
 "use client";
 
 import { CalendarDays, Download, MapPin, QrCode, Ticket as TicketIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/section-heading";
@@ -9,12 +9,12 @@ import { EmptyState } from "@/components/states";
 import { TicketStatusBadge } from "@/components/status-badges";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getEvent } from "@/data/events";
-import { getTicketsByUser } from "@/data/tickets";
+import { getEvents, getMyTickets } from "@/lib/api";
 import { formatDate, formatLongDate, to12h } from "@/lib/format";
 import { useAuth } from "@/lib/auth-context";
-import type { Ticket } from "@/types";
+import type { Event, Ticket } from "@/types";
 import Link from "next/link";
 
 function QrMock({ id }: { id: string }) {
@@ -31,9 +31,7 @@ function QrMock({ id }: { id: string }) {
   );
 }
 
-function TicketRow({ ticket }: { ticket: Ticket }) {
-  const event = getEvent(ticket.eventId);
-
+function TicketRow({ ticket, event }: { ticket: Ticket; event?: Event }) {
   return (
     <article className="relative overflow-hidden rounded-2xl border border-border bg-card">
       <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary to-primary/20" />
@@ -94,8 +92,21 @@ function TicketRow({ ticket }: { ticket: Ticket }) {
 
 export function TicketsPage() {
   const { user } = useAuth();
-  const all = getTicketsByUser(user?.id ?? "");
+  const [all, setAll] = useState<Ticket[]>([]);
+  const [events, setEvents] = useState<Record<string, Event>>({});
+  const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("valid");
+
+  useEffect(() => {
+    if (!user) return;
+    Promise.all([getMyTickets(), getEvents()])
+      .then(([myTickets, myEvents]) => {
+        setAll(myTickets);
+        setEvents(Object.fromEntries(myEvents.map((e) => [e.id, e])));
+      })
+      .catch((error) => toast.error(error.message ?? "Failed to load tickets"))
+      .finally(() => setLoading(false));
+  }, [user]);
 
   const groups = {
     valid: all.filter((t) => t.status === "valid"),
@@ -116,36 +127,44 @@ export function TicketsPage() {
         }
       />
 
-      <Tabs value={tab} onValueChange={setTab}>
-        <TabsList>
-          <TabsTrigger value="valid">Upcoming ({groups.valid.length})</TabsTrigger>
-          <TabsTrigger value="used">Attended ({groups.used.length})</TabsTrigger>
-          <TabsTrigger value="refunded">Refunded ({groups.refunded.length})</TabsTrigger>
-        </TabsList>
+      {loading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-12 w-72" />
+          <Skeleton className="h-40 w-full" />
+          <Skeleton className="h-40 w-full" />
+        </div>
+      ) : (
+        <Tabs value={tab} onValueChange={setTab}>
+          <TabsList>
+            <TabsTrigger value="valid">Upcoming ({groups.valid.length})</TabsTrigger>
+            <TabsTrigger value="used">Attended ({groups.used.length})</TabsTrigger>
+            <TabsTrigger value="refunded">Refunded ({groups.refunded.length})</TabsTrigger>
+          </TabsList>
 
-        {(["valid", "used", "refunded"] as const).map((key) => (
-          <TabsContent key={key} value={key} className="pt-8">
-            {groups[key].length ? (
-              <div className="grid gap-5">
-                {groups[key].map((t) => (
-                  <TicketRow key={t.id} ticket={t} />
-                ))}
-              </div>
-            ) : (
-              <EmptyState
-                icon={TicketIcon}
-                title="Nothing here yet"
-                description="Tickets you buy will appear in this wallet instantly."
-                action={
-                  <Button asChild>
-                    <Link href="/events">Explore events</Link>
-                  </Button>
-                }
-              />
-            )}
-          </TabsContent>
-        ))}
-      </Tabs>
+          {(["valid", "used", "refunded"] as const).map((key) => (
+            <TabsContent key={key} value={key} className="pt-8">
+              {groups[key].length ? (
+                <div className="grid gap-5">
+                  {groups[key].map((t) => (
+                    <TicketRow key={t.id} ticket={t} event={t.event ?? events[t.eventId]} />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={TicketIcon}
+                  title="Nothing here yet"
+                  description="Tickets you buy will appear in this wallet instantly."
+                  action={
+                    <Button asChild>
+                      <Link href="/events">Explore events</Link>
+                    </Button>
+                  }
+                />
+              )}
+            </TabsContent>
+          ))}
+        </Tabs>
+      )}
     </div>
   );
 }

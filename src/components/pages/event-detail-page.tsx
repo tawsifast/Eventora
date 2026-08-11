@@ -13,9 +13,9 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
-import Image from "next/image";
 import { toast } from "sonner";
 
+import { EventImage } from "@/components/event-image";
 import { StarRating } from "@/components/star-rating";
 import { CategoryBadge, EventStatusBadge } from "@/components/status-badges";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -23,11 +23,12 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { getCategoryName } from "@/data/categories";
-import { getUpcomingEvents } from "@/data/events";
-import { getReviewsByEvent } from "@/data/reviews";
+import { useAuth } from "@/lib/auth-context";
+import { createOrder, createReview } from "@/lib/api";
 import { EventCard } from "@/components/event-card";
-import type { ScheduleItem, TicketTier, Event } from "@/types";
+import type { Review, ScheduleItem, TicketTier, Event } from "@/types";
 import {
   calcServiceFee,
   formatCurrency,
@@ -37,17 +38,26 @@ import {
   formatTimeRange,
 } from "@/lib/format";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-export function EventDetailPage({ event }: { event: Event }) {
-  const reviews = getReviewsByEvent(event.id);
-  const related = getUpcomingEvents(8)
-    .filter((e) => e.id !== event.id && e.categorySlug === event.categorySlug)
-    .slice(0, 3);
-  const fallbackRelated = getUpcomingEvents(4).filter((e) => e.id !== event.id).slice(0, 3);
-  const suggestions = related.length ? related : fallbackRelated;
-
+export function EventDetailPage({
+  event,
+  reviews,
+  related,
+}: {
+  event: Event;
+  reviews: Review[];
+  related: Event[];
+}) {
+  const router = useRouter();
+  const { user, isPending: authPending } = useAuth();
   const [tierId, setTierId] = useState(event.tiers[0]?.id ?? "");
   const [qty, setQty] = useState(1);
+  const [booking, setBooking] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+
   const tier = event.tiers.find((t: TicketTier) => t.id === tierId) ?? event.tiers[0];
   const subtotal = (tier?.price ?? event.price) * qty;
   const fee = calcServiceFee(subtotal);
@@ -55,18 +65,54 @@ export function EventDetailPage({ event }: { event: Event }) {
   const soldPct = Math.min(100, Math.round((event.ticketsSold / event.capacity) * 100));
   const seatsLeft = Math.max(0, event.capacity - event.ticketsSold);
 
+  async function handleBooking() {
+    if (!user) {
+      toast.error("Please log in to buy tickets");
+      return;
+    }
+
+    setBooking(true);
+    try {
+      await createOrder({
+        eventId: event.id,
+        quantity: qty,
+        tierId: tier?.id,
+        attendeeName: user.name,
+      });
+      toast.success(`${qty} × ${tier?.name ?? "General"} — order placed! Your ticket is in your wallet.`);
+      router.push("/tickets");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to place the order");
+    } finally {
+      setBooking(false);
+    }
+  }
+
+  async function handleReview() {
+    if (!user) {
+      toast.error("Please log in to write a review");
+      return;
+    }
+
+    setReviewSubmitting(true);
+    try {
+      await createReview({ eventId: event.id, rating: reviewRating, comment: reviewComment.trim() || undefined });
+      toast.success("Review published — thank you!");
+      setReviewComment("");
+      setReviewRating(5);
+      window.location.reload();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Failed to publish the review");
+    } finally {
+      setReviewSubmitting(false);
+    }
+  }
+
   return (
     <div>
       <section className="relative isolate">
         <div className="absolute inset-0 -z-10 overflow-hidden">
-          <Image
-            src={event.imageUrl}
-            alt={event.title}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
+          <EventImage event={event} sizes="100vw" priority className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/45" />
         </div>
         <div className="mx-auto w-full max-w-7xl px-4 pb-12 pt-16 sm:px-6 sm:pt-24 lg:px-8">
@@ -199,6 +245,58 @@ export function EventDetailPage({ event }: { event: Event }) {
                   </p>
                 </div>
               </div>
+
+              {authPending || user ? (
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleReview();
+                  }}
+                  className="space-y-4 rounded-2xl border border-border bg-card p-6"
+                >
+                  <div>
+                    <p className="text-sm font-medium">Write a review</p>
+                    <div className="mt-2 flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setReviewRating(star)}
+                          aria-label={`${star} stars`}
+                          className="rounded p-0.5 transition-transform hover:scale-110"
+                        >
+                          <Star
+                            className={
+                              star <= reviewRating
+                                ? "size-5 fill-warning text-warning"
+                                : "size-5 fill-transparent text-muted-foreground/40"
+                            }
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <Textarea
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    placeholder="Tell others what the event was like..."
+                    rows={3}
+                  />
+                  <div className="flex justify-end">
+                    <Button type="submit" disabled={reviewSubmitting} size="sm">
+                      {reviewSubmitting ? "Publishing..." : "Publish review"}
+                    </Button>
+                  </div>
+                </form>
+              ) : (
+                <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+                  <Link href="/login" className="font-medium text-primary hover:underline">
+                    Log in
+                  </Link>{" "}
+                  to write a review.
+                </p>
+              )}
+
               {reviews.length ? (
                 <div className="grid gap-4">
                   {reviews.map((r) => (
@@ -245,9 +343,9 @@ export function EventDetailPage({ event }: { event: Event }) {
                   key={t.id}
                   type="button"
                   onClick={() => setTierId(t.id)}
-                  className={`flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
+                  className={`flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-[color,background-color,border-color,box-shadow] duration-300 ${
                     t.id === tier?.id
-                      ? "border-primary bg-primary/10"
+                      ? "border-primary bg-primary/10 shadow-[0_0_24px_-8px_color-mix(in_oklab,var(--primary)_60%,transparent)]"
                       : "border-border hover:border-primary/40 hover:bg-accent"
                   }`}
                 >
@@ -293,10 +391,10 @@ export function EventDetailPage({ event }: { event: Event }) {
             <Button
               className="w-full"
               size="lg"
-              disabled={seatsLeft === 0}
-              onClick={() => toast.success(`${qty} × ${tier?.name} reserved for ${event.title}`)}
+              disabled={seatsLeft === 0 || booking}
+              onClick={handleBooking}
             >
-              <Ticket className="size-4" /> {seatsLeft === 0 ? "Sold out" : "Get tickets"}
+              <Ticket className="size-4" /> {booking ? "Placing order..." : seatsLeft === 0 ? "Sold out" : "Get tickets"}
             </Button>
             <Button
               variant="outline"
@@ -319,7 +417,7 @@ export function EventDetailPage({ event }: { event: Event }) {
         </aside>
       </div>
 
-      {suggestions.length ? (
+      {related.length ? (
         <section className="border-t border-border">
           <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-16 sm:px-6 lg:px-8">
             <div className="space-y-2">
@@ -327,7 +425,7 @@ export function EventDetailPage({ event }: { event: Event }) {
               <h2 className="text-3xl sm:text-4xl">More experiences</h2>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {suggestions.map((e) => (
+              {related.map((e) => (
                 <EventCard key={e.id} event={e} />
               ))}
             </div>

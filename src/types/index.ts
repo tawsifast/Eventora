@@ -115,4 +115,5 @@ export interface Ticket {
   quantity: number;
   status: TicketStatus;
   purchasedAt: string;
+  event?: Event;
 }

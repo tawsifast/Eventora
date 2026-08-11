@@ -1,7 +1,7 @@
 "use client";
 
 import { Receipt, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/section-heading";
@@ -10,17 +10,28 @@ import { OrderStatusBadge, PaymentStatusBadge } from "@/components/status-badges
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getOrdersByCustomer } from "@/data/orders";
+import { getMyOrders } from "@/lib/api";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { useAuth } from "@/lib/auth-context";
+import type { Order } from "@/types";
 import Link from "next/link";
 
 export function OrdersPage() {
   const { user } = useAuth();
-  const all = getOrdersByCustomer(user?.id ?? "");
+  const [all, setAll] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
+
+  useEffect(() => {
+    if (!user) return;
+    getMyOrders()
+      .then(setAll)
+      .catch((error) => toast.error(error.message ?? "Failed to load orders"))
+      .finally(() => setLoading(false));
+  }, [user]);
 
   const filtered = useMemo(
     () =>
@@ -42,7 +53,7 @@ export function OrdersPage() {
       <PageHeader
         eyebrow="Purchase history"
         title="Your Orders"
-        subtitle={`${all.length} orders · ${formatCurrency(totalSpent)} spent on EventHub`}
+        subtitle={`${loading ? "…" : all.length} orders · ${loading ? "…" : formatCurrency(totalSpent)} spent on EventHub`}
         action={
           <Button asChild variant="outline">
             <Link href="/tickets">Open ticket wallet</Link>
@@ -50,7 +61,14 @@ export function OrdersPage() {
         }
       />
 
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 sm:flex sm:items-center">
+      {loading ? (
+        <div className="space-y-3">
+          <Skeleton className="h-14 w-full" />
+          <Skeleton className="h-64 w-full" />
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 sm:flex sm:items-center">
         <div className="relative min-w-0">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
@@ -140,6 +158,8 @@ export function OrdersPage() {
             </Button>
           }
         />
+      )}
+        </>
       )}
     </div>
   );

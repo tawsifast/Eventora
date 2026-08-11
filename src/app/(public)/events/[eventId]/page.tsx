@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { EventDetailPage } from "@/components/pages/event-detail-page";
-import { events } from "@/data/events";
+import { getEvent, getEventReviews, getEvents } from "@/lib/api";
+import type { Event, Review } from "@/types";
 
 export async function generateMetadata({
   params,
@@ -10,20 +11,22 @@ export async function generateMetadata({
   params: Promise<{ eventId: string }>;
 }): Promise<Metadata> {
   const { eventId } = await params;
-  const event = events.find((e) => e.slug === eventId || e.id === eventId);
 
-  if (!event) {
+  let event: Event;
+  try {
+    event = await getEvent(eventId);
+  } catch {
     return {
-      title: "Event not found — EventHub",
+      title: "Event not found â€” EventHub",
       robots: { index: false },
     };
   }
 
   return {
-    title: `${event.title} — EventHub`,
+    title: `${event.title} â€” EventHub`,
     description: `${event.shortDescription} ${event.venue}, ${event.city}. Get your tickets on EventHub.`,
     openGraph: {
-      title: `${event.title} — EventHub`,
+      title: `${event.title} â€” EventHub`,
       description: `${event.venue}, ${event.city}`,
     },
   };
@@ -31,11 +34,29 @@ export async function generateMetadata({
 
 export default async function Page({ params }: { params: Promise<{ eventId: string }> }) {
   const { eventId } = await params;
-  const event = events.find((e) => e.slug === eventId || e.id === eventId);
 
-  if (!event) {
+  let event: Event;
+  try {
+    event = await getEvent(eventId);
+  } catch {
     notFound();
   }
 
-  return <EventDetailPage event={event} />;
+  // reviews + "you may also like" suggestions in parallel
+  let reviews: Review[] = [];
+  let related: Event[] = [];
+  try {
+    const [allReviews, allEvents] = await Promise.all([getEventReviews(event.id), getEvents()]);
+    reviews = allReviews;
+    related = allEvents
+      .filter((e) => e.id !== event.id && e.categorySlug === event.categorySlug && e.status === "upcoming")
+      .slice(0, 3);
+    if (related.length === 0) {
+      related = allEvents.filter((e) => e.id !== event.id && e.status === "upcoming").slice(0, 3);
+    }
+  } catch {
+    // backend offline â€” detail still renders, sections stay empty
+  }
+
+  return <EventDetailPage event={event} reviews={reviews} related={related} />;
 }

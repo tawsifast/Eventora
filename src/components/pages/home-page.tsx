@@ -11,15 +11,18 @@ import { SectionHeading } from "@/components/section-heading";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import heroImage from "@/assets/hero-events.jpg";
-import { categories } from "@/data/categories";
-import { getFeaturedEvents, getUpcomingEvents } from "@/data/events";
 import Link from "next/link";
+import type { Category, Event } from "@/types";
 
-export function HomePage() {
+interface HomePageProps {
+  featured: Event[];
+  upcoming: Event[];
+  categories: Category[];
+}
+
+export function HomePage({ featured, upcoming, categories }: HomePageProps) {
   const [query, setQuery] = useState("");
   const router = useRouter();
-  const featured = getFeaturedEvents();
-  const upcoming = getUpcomingEvents(4);
 
   return (
     <div>

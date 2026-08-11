@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Image from "next/image";
 import { ArrowUpRight, Clock, MapPin, Ticket } from "lucide-react";
 
+import { EventImage } from "@/components/event-image";
 import { CategoryBadge, EventStatusBadge } from "@/components/status-badges";
 import { Button } from "@/components/ui/button";
 import { getCategoryName } from "@/data/categories";
@@ -24,10 +24,8 @@ export function EventCard({ event, className }: { event: Event; className?: stri
         href={`/events/${event.slug}`}
         className="relative block aspect-[16/11] overflow-hidden"
       >
-        <Image
-          src={event.imageUrl}
-          alt={event.title}
-          fill
+        <EventImage
+          event={event}
           sizes="(min-width:1024px) 25vw, (min-width:640px) 50vw, 100vw"
           className="object-cover saturate-[0.9] transition-transform duration-700 group-hover:scale-[1.06]"
         />
@@ -99,10 +97,8 @@ export function CompactEventCard({ event }: { event: Event }) {
         href={`/events/${event.slug}`}
         className="relative size-24 shrink-0 overflow-hidden rounded-xl sm:size-28"
       >
-        <Image
-          src={event.imageUrl}
-          alt={event.title}
-          fill
+        <EventImage
+          event={event}
           sizes="128px"
           className="object-cover transition-transform duration-700 group-hover:scale-105"
         />

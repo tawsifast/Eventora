@@ -19,18 +19,20 @@ import {
 } from "@/components/ui/pagination";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { categories } from "@/data/categories";
-import { events } from "@/data/events";
-import type { EventStatus } from "@/types";
+import type { Category, Event, EventStatus } from "@/types";
 
 const PER_PAGE = 6;
 
 export function ExploreEventsPage({
   initialQuery = "",
   initialCategory = "all",
+  events,
+  categories,
 }: {
   initialQuery?: string;
   initialCategory?: string;
+  events: Event[];
+  categories: Category[];
 }) {
   const router = useRouter();
 
@@ -44,7 +46,7 @@ export function ExploreEventsPage({
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    const now = new Date("2026-08-08");
+    const now = new Date();
 
     const list = events.filter((event) => {
       const matchesQuery =
@@ -81,7 +83,7 @@ export function ExploreEventsPage({
           return a.date.localeCompare(b.date);
       }
     });
-  }, [query, category, status, dateRange, maxPrice, sort]);
+  }, [query, category, status, dateRange, maxPrice, sort, events]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
   const current = Math.min(page, totalPages);

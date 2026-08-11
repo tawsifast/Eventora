@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { ExploreEventsPage } from "@/components/pages/explore-events-page";
+import { getCategories, getEvents } from "@/lib/api";
+import type { Category, Event } from "@/types";
 
 export const metadata: Metadata = {
   title: "Explore Events — EventHub",
@@ -21,5 +23,15 @@ export default async function Page({
   const q = typeof params.q === "string" ? params.q : undefined;
   const category = typeof params.category === "string" ? params.category : undefined;
 
-  return <ExploreEventsPage initialQuery={q ?? ""} initialCategory={category ?? "all"} />;
+  let events: Event[] = [];
+  let categories: Category[] = [];
+  try {
+    [events, categories] = await Promise.all([getEvents(), getCategories()]);
+  } catch {
+    // backend offline — the page renders with empty data
+  }
+
+  return (
+    <ExploreEventsPage initialQuery={q ?? ""} initialCategory={category ?? "all"} events={events} categories={categories} />
+  );
 }

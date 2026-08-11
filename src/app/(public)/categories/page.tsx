@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 import { CategoryCard } from "@/components/category-card";
 import { PageHeader } from "@/components/section-heading";
-import { categories } from "@/data/categories";
+import { getCategories } from "@/lib/api";
+import type { Category } from "@/types";
 
 export const metadata: Metadata = {
   title: "Event Categories — EventHub",
@@ -14,7 +15,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function CategoriesPage() {
+export default async function CategoriesPage() {
+  let categories: Category[] = [];
+  try {
+    categories = await getCategories();
+  } catch {
+    // backend offline — empty grid
+  }
+
   return (
     <div className="mx-auto w-full max-w-7xl space-y-10 px-4 py-12 sm:px-6 lg:px-8">
       <PageHeader title="Categories" subtitle="Eight ways to spend an evening — or a whole weekend." />
