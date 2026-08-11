@@ -4,10 +4,11 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+import { AdminUsersTable } from "@/components/admin/users-table";
 import { DashboardShell } from "@/components/dashboard-shell";
 import { PageHeader } from "@/components/section-heading";
 import { StatCard } from "@/components/stat-card";
-import { EventStatusBadge, OrderStatusBadge, RoleBadge, UserStatusBadge } from "@/components/status-badges";
+import { EventStatusBadge, OrderStatusBadge } from "@/components/status-badges";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { getAdminEvents, getAdminOrders, getAdminStats, getAdminUsers } from "@/lib/api";
 import { formatCurrency, formatDate, formatNumber } from "@/lib/format";
@@ -141,38 +142,7 @@ export default async function AdminPage() {
 
       <section className="space-y-4">
         <h2 className="text-2xl">Users</h2>
-        <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Joined</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {allUsers.map((u) => (
-                  <TableRow key={u.id}>
-                    <TableCell className="font-medium">{u.name}</TableCell>
-                    <TableCell className="max-w-[200px] truncate text-muted-foreground">{u.email}</TableCell>
-                    <TableCell>
-                      <RoleBadge role={u.role} />
-                    </TableCell>
-                    <TableCell>
-                      <UserStatusBadge status={u.status} />
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap text-right text-muted-foreground">
-                      {formatDate(u.joinedAt)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
+        <AdminUsersTable users={allUsers} currentUserId={currentUser.id} />
       </section>
     </DashboardShell>
   );

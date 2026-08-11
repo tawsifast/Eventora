@@ -219,6 +219,12 @@ export async function updateUser(id: string, data: Record<string, unknown>, cook
   return mapUser(await api<any>(`/users/${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify(data) }, cookie));
 }
 
+export async function updateUserRole(id: string, role: User["role"], cookie?: string): Promise<User> {
+  return mapUser(
+    await api<any>(`/users/${encodeURIComponent(id)}/role`, { method: "PATCH", body: JSON.stringify({ role }) }, cookie),
+  );
+}
+
 export async function getMyOrders(cookie?: string): Promise<Order[]> {
   return (await api<any[]>("/orders", {}, cookie)).map(mapOrder);
 }
