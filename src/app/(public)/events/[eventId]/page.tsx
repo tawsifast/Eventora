@@ -46,13 +46,20 @@ export default async function Page({ params }: { params: Promise<{ eventId: stri
   let reviews: Review[] = [];
   let related: Event[] = [];
   try {
-    const [allReviews, allEvents] = await Promise.all([getEventReviews(event.id), getEvents()]);
+    const [allReviews, allEvents]: [Review[], Event[]] = await Promise.all([getEventReviews(event.id), getEvents()]);
     reviews = allReviews;
     related = allEvents
-      .filter((e) => e.id !== event.id && e.categorySlug === event.categorySlug && e.status === "upcoming")
+      .filter(
+        (e) =>
+          e.id !== event.id &&
+          e.category?.slug === event.category?.slug &&
+          String(e.status).toLowerCase() === "upcoming"
+      )
       .slice(0, 3);
     if (related.length === 0) {
-      related = allEvents.filter((e) => e.id !== event.id && e.status === "upcoming").slice(0, 3);
+      related = allEvents
+        .filter((e) => e.id !== event.id && String(e.status).toLowerCase() === "upcoming")
+        .slice(0, 3);
     }
   } catch {
     // backend offline â€” detail still renders, sections stay empty

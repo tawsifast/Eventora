@@ -17,7 +17,7 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
-function initialsFromName(name: string): string {
+export function initialsFromName(name: string): string {
   return (
     name
       .trim()

@@ -38,15 +38,15 @@ export function OrdersPage() {
       all.filter((o) => {
         const matchesQuery =
           !query ||
-          o.eventTitle.toLowerCase().includes(query.toLowerCase()) ||
+          (o.event?.title ?? "Event").toLowerCase().includes(query.toLowerCase()) ||
           o.id.toLowerCase().includes(query.toLowerCase());
-        const matchesStatus = status === "all" || o.status === status;
+        const matchesStatus = status === "all" || String(o.status).toLowerCase() === status;
         return matchesQuery && matchesStatus;
       }),
     [all, query, status],
   );
 
-  const totalSpent = all.reduce((sum, o) => (o.paymentStatus === "paid" ? sum + o.amount : sum), 0);
+  const totalSpent = all.reduce((sum, o) => (String(o.paymentStatus).toLowerCase() === "paid" ? sum + o.amount : sum), 0);
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-10 px-4 py-14 sm:px-6 lg:px-8">
@@ -112,7 +112,7 @@ export function OrdersPage() {
                 {filtered.map((o) => (
                   <TableRow key={o.id}>
                     <TableCell className="font-mono text-xs">{o.id}</TableCell>
-                    <TableCell className="max-w-[220px] truncate font-medium">{o.eventTitle}</TableCell>
+                    <TableCell className="max-w-[220px] truncate font-medium">{o.event?.title ?? "Event"}</TableCell>
                     <TableCell className="whitespace-nowrap text-muted-foreground">
                       {formatDate(o.createdAt)}
                     </TableCell>

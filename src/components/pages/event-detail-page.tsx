@@ -25,7 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { getCategoryName } from "@/data/categories";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, initialsFromName } from "@/lib/auth-context";
 import { createOrder, createReview } from "@/lib/api";
 import { EventCard } from "@/components/event-card";
 import type { Review, ScheduleItem, TicketTier, Event } from "@/types";
@@ -122,7 +122,7 @@ export function EventDetailPage({
             </Link>
           </Button>
           <div className="flex flex-wrap items-center gap-2">
-            <CategoryBadge name={getCategoryName(event.categorySlug)} />
+            <CategoryBadge name={getCategoryName(event.category?.slug ?? "general")} />
             <EventStatusBadge status={event.status} />
             {event.featured ? (
               <span className="rounded-full border border-primary/40 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
@@ -143,7 +143,7 @@ export function EventDetailPage({
               <MapPin className="size-4 text-primary" /> {event.venue}, {event.city}
             </span>
             <span className="flex items-center gap-2">
-              <User2 className="size-4 text-primary" /> {event.organizerName}
+              <User2 className="size-4 text-primary" /> {event.organizer?.name ?? "Organizer"}
             </span>
             <span className="flex items-center gap-2">
               <Star className="size-4 fill-primary text-primary" /> {event.rating.toFixed(1)} ({event.reviewCount}{" "}
@@ -304,11 +304,11 @@ export function EventDetailPage({
                       <div className="flex items-center gap-3">
                         <Avatar className="size-9 border border-border">
                           <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
-                            {r.userInitials}
+                            {initialsFromName(r.user?.name ?? "Attendee")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                          <p className="truncate font-medium">{r.userName}</p>
+                          <p className="truncate font-medium">{r.user?.name ?? "Attendee"}</p>
                           <p className="text-xs text-muted-foreground">{formatRelative(r.createdAt)}</p>
                         </div>
                         <div className="ml-auto shrink-0">

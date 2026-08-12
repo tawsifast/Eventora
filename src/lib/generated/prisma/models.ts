@@ -8,7 +8,6 @@
  *
  * 🟢 You can import this file directly.
  */
-export type * from './models/event'
 export type * from './models/users'
 export type * from './models/User'
 export type * from './models/Session'

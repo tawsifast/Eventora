@@ -43,7 +43,7 @@ export default function LoginPage() {
         <h1 className="text-3xl font-semibold tracking-tight">Welcome back</h1>
         <p className="text-sm text-muted-foreground">Log in to see your tickets and orders.</p>
       </div>
-      <form className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]" onSubmit={submit} noValidate>
+      <form className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-card" onSubmit={submit} noValidate>
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input

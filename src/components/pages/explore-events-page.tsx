@@ -54,9 +54,9 @@ export function ExploreEventsPage({
         event.title.toLowerCase().includes(q) ||
         event.city.toLowerCase().includes(q) ||
         event.venue.toLowerCase().includes(q) ||
-        event.organizerName.toLowerCase().includes(q);
-      const matchesCategory = category === "all" || event.categorySlug === category;
-      const matchesStatus = status === "all" || event.status === status;
+        (event.organizer?.name ?? "").toLowerCase().includes(q);
+      const matchesCategory = category === "all" || (event.category?.slug ?? "general") === category;
+      const matchesStatus = status === "all" || String(event.status).toLowerCase() === status;
       const matchesPrice = event.price <= maxPrice;
 
       let matchesDate = true;

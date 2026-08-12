@@ -7,12 +7,7 @@ datasource db {
   provider = "postgresql"
 }
 
-model event {
-  id          String @id
-  title       String
-  description String
-  price       Int
-}
+
 
 model users {
   id       String   @id

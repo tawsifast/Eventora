@@ -95,12 +95,12 @@ export function TicketsPage() {
   const [all, setAll] = useState<Ticket[]>([]);
   const [events, setEvents] = useState<Record<string, Event>>({});
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState("valid");
+  const [tab, setTab] = useState("active");
 
   useEffect(() => {
     if (!user) return;
     Promise.all([getMyTickets(), getEvents()])
-      .then(([myTickets, myEvents]) => {
+      .then(([myTickets, myEvents]: [Ticket[], Event[]]) => {
         setAll(myTickets);
         setEvents(Object.fromEntries(myEvents.map((e) => [e.id, e])));
       })
@@ -109,9 +109,9 @@ export function TicketsPage() {
   }, [user]);
 
   const groups = {
-    valid: all.filter((t) => t.status === "valid"),
-    used: all.filter((t) => t.status === "used"),
-    refunded: all.filter((t) => t.status === "refunded"),
+    active: all.filter((t) => String(t.status).toLowerCase() === "active"),
+    used: all.filter((t) => String(t.status).toLowerCase() === "used"),
+    cancelled: all.filter((t) => String(t.status).toLowerCase() === "cancelled"),
   };
 
   return (
@@ -136,12 +136,12 @@ export function TicketsPage() {
       ) : (
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList>
-            <TabsTrigger value="valid">Upcoming ({groups.valid.length})</TabsTrigger>
+            <TabsTrigger value="active">Upcoming ({groups.active.length})</TabsTrigger>
             <TabsTrigger value="used">Attended ({groups.used.length})</TabsTrigger>
-            <TabsTrigger value="refunded">Refunded ({groups.refunded.length})</TabsTrigger>
+            <TabsTrigger value="cancelled">Cancelled ({groups.cancelled.length})</TabsTrigger>
           </TabsList>
 
-          {(["valid", "used", "refunded"] as const).map((key) => (
+          {(["active", "used", "cancelled"] as const).map((key) => (
             <TabsContent key={key} value={key} className="pt-8">
               {groups[key].length ? (
                 <div className="grid gap-5">

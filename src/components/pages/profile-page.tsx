@@ -47,7 +47,7 @@ export function ProfilePage() {
   }
 
   const profile = user;
-  const spent = orders.reduce((s, o) => (o.paymentStatus === "paid" ? s + o.amount : s), 0);
+  const spent = orders.reduce((s, o) => (String(o.paymentStatus).toLowerCase() === "paid" ? s + o.amount : s), 0);
 
   async function handleSave(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

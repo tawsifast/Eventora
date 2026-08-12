@@ -90,7 +90,7 @@ export default async function AdminPage() {
                         {e.title}
                       </Link>
                     </TableCell>
-                    <TableCell className="max-w-[160px] truncate text-muted-foreground">{e.organizerName}</TableCell>
+                    <TableCell className="max-w-[160px] truncate text-muted-foreground">{e.organizer?.name ?? "Organizer"}</TableCell>
                     <TableCell className="whitespace-nowrap text-muted-foreground">{formatDate(e.date)}</TableCell>
                     <TableCell>
                       <EventStatusBadge status={e.status} />
@@ -125,7 +125,7 @@ export default async function AdminPage() {
                   <TableRow key={o.id}>
                     <TableCell className="font-mono text-xs">{o.id}</TableCell>
                     <TableCell className="max-w-[160px] truncate">{o.customerName}</TableCell>
-                    <TableCell className="max-w-[200px] truncate text-muted-foreground">{o.eventTitle}</TableCell>
+                    <TableCell className="max-w-[200px] truncate text-muted-foreground">{o.event?.title ?? "Event"}</TableCell>
                     <TableCell>
                       <OrderStatusBadge status={o.status} />
                     </TableCell>

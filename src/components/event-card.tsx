@@ -38,7 +38,7 @@ export function EventCard({ event, className }: { event: Event; className?: stri
           <EventStatusBadge status={event.status} className="bg-background/80 backdrop-blur-md" />
         </div>
         <div className="absolute inset-x-4 bottom-4">
-          <CategoryBadge name={getCategoryName(event.categorySlug)} />
+          <CategoryBadge name={getCategoryName(event.category?.slug ?? "general")} />
         </div>
       </Link>
 
@@ -105,7 +105,7 @@ export function CompactEventCard({ event }: { event: Event }) {
       </Link>
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-          {formatDate(event.date)} · {getCategoryName(event.categorySlug)}
+          {formatDate(event.date)} · {getCategoryName(event.category?.slug ?? "general")}
         </p>
         <h3 className="truncate text-xl leading-tight">
           <Link href={`/events/${event.slug}`} className="hover:text-primary">

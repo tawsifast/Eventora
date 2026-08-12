@@ -13,6 +13,24 @@ const nextConfig: import('next').NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    const backend = process.env.BACKEND_URL;
+    if (!backend) return [];
+    const prefixes = [
+      "/api/events",
+      "/api/categories",
+      "/api/users",
+      "/api/orders",
+      "/api/tickets",
+      "/api/reviews",
+      "/api/organizers",
+      "/api/admin",
+    ];
+    return prefixes.map((prefix) => ({
+      source: `${prefix}/:path*`,
+      destination: `${backend}${prefix}/:path*`,
+    }));
+  },
 };
 
 export default nextConfig;

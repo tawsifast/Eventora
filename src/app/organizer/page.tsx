@@ -41,7 +41,7 @@ export default async function OrganizerDashboard() {
   let recentOrders: Order[] = [];
   let stats = { totalEvents: 0, totalTicketsSold: 0, totalRevenue: 0 };
   try {
-    const [allEvents, orders] = await Promise.all([
+    const [allEvents, orders]: [Event[], Order[]] = await Promise.all([
       getEvents(cookie),
       getOrganizerOrders(cookie).catch(() => [] as Order[]),
     ]);
@@ -148,7 +148,7 @@ export default async function OrganizerDashboard() {
                     <TableRow key={o.id}>
                       <TableCell className="font-mono text-xs">{o.id}</TableCell>
                       <TableCell className="max-w-[160px] truncate">{o.customerName}</TableCell>
-                      <TableCell className="max-w-[200px] truncate text-muted-foreground">{o.eventTitle}</TableCell>
+                      <TableCell className="max-w-[200px] truncate text-muted-foreground">{o.event?.title ?? "Event"}</TableCell>
                       <TableCell className="text-center">{o.quantity}</TableCell>
                       <TableCell>
                         <OrderStatusBadge status={o.status} />

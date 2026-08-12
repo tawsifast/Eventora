@@ -38,7 +38,7 @@ export function CategoryCard({ category }: { category: Category }) {
       </span>
       <span className="space-y-1">
         <span className="block font-semibold">{category.name}</span>
-        <span className="block text-sm text-muted-foreground">{formatNumber(category.eventCount)} events</span>
+        <span className="block text-sm text-muted-foreground">{formatNumber(category._count?.events ?? category.eventCount)} events</span>
       </span>
     </Link>
   );

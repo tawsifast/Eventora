@@ -82,7 +82,7 @@ export function AdminUsersTable({ users, currentUserId }: { users: User[]; curre
                   <UserStatusBadge status={u.status} />
                 </TableCell>
                 <TableCell className="whitespace-nowrap text-right text-muted-foreground">
-                  {formatDate(u.joinedAt)}
+                  {formatDate(u.createdAt ?? u.joinedAt)}
                 </TableCell>
               </TableRow>
             ))}

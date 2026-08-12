@@ -2,9 +2,10 @@ import Link from "next/link";
 
 import { EventHubLogo } from "@/components/site-header";
 import { getCategories } from "@/lib/api";
+import type { Category } from "@/types";
 
 export async function SiteFooter() {
-  let categories: Awaited<ReturnType<typeof getCategories>> = [];
+  let categories: Category[] = [];
   try {
     categories = await getCategories();
   } catch {

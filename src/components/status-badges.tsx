@@ -12,8 +12,9 @@ const eventStyles: Record<EventStatus, string> = {
 };
 
 export function EventStatusBadge({ status, className }: { status: EventStatus; className?: string }) {
+  const key = String(status).toLowerCase() as EventStatus;
   return (
-    <Badge variant="outline" className={cn(base, eventStyles[status], className)}>
+    <Badge variant="outline" className={cn(base, eventStyles[key], className)}>
       {status}
     </Badge>
   );
@@ -26,8 +27,9 @@ const orderStyles: Record<OrderStatus, string> = {
 };
 
 export function OrderStatusBadge({ status }: { status: OrderStatus }) {
+  const key = String(status).toLowerCase() as OrderStatus;
   return (
-    <Badge variant="outline" className={cn(base, orderStyles[status])}>
+    <Badge variant="outline" className={cn(base, orderStyles[key])}>
       {status}
     </Badge>
   );
@@ -40,22 +42,24 @@ const paymentStyles: Record<PaymentStatus, string> = {
 };
 
 export function PaymentStatusBadge({ status }: { status: PaymentStatus }) {
+  const key = String(status).toLowerCase() as PaymentStatus;
   return (
-    <Badge variant="outline" className={cn(base, paymentStyles[status])}>
+    <Badge variant="outline" className={cn(base, paymentStyles[key])}>
       {status}
     </Badge>
   );
 }
 
-const ticketStyles: Record<TicketStatus, string> = {
-  valid: "border-success/30 bg-success/10 text-success",
+const ticketStyles: Record<string, string> = {
+  active: "border-success/30 bg-success/10 text-success",
   used: "border-border bg-muted text-muted-foreground",
-  refunded: "border-destructive/30 bg-destructive/10 text-destructive",
+  cancelled: "border-destructive/30 bg-destructive/10 text-destructive",
 };
 
 export function TicketStatusBadge({ status }: { status: TicketStatus }) {
+  const key = String(status).toLowerCase();
   return (
-    <Badge variant="outline" className={cn(base, ticketStyles[status])}>
+    <Badge variant="outline" className={cn(base, ticketStyles[key])}>
       {status}
     </Badge>
   );
@@ -81,7 +85,7 @@ export function UserStatusBadge({ status }: { status: UserStatus }) {
       variant="outline"
       className={cn(
         base,
-        status === "active"
+        String(status).toLowerCase() === "active"
           ? "border-success/30 bg-success/10 text-success"
           : "border-destructive/30 bg-destructive/10 text-destructive",
       )}

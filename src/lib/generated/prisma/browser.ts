@@ -18,11 +18,6 @@ export { Prisma }
 export * as $Enums from './enums'
 export * from './enums';
 /**
- * Model event
- * 
- */
-export type event = Prisma.eventModel
-/**
  * Model users
  * 
  */

@@ -1,308 +1,521 @@
 /**
- * Small fetch helper for the Eventora backend API (http://localhost:5000/api).
+ * Simple fetch helpers for the Eventora backend API.
  *
- * All requests send the Better Auth session cookie (`credentials: "include"`)
- * so the backend knows which user is logged in. Response data is mapped into
- * the EventHub domain types from `src/types` so components never change.
+ * Every function:
+ *   1. fetches the API URL
+ *   2. parses the JSON response
+ *   3. checks response.ok
+ *   4. returns result.data
+ *   5. throws Error(result.message) when the request fails
+ *
+ * `NEXT_PUBLIC_API_URL` points to the backend in development
+ * (http://localhost:5000/api) and is empty in production, where Next.js
+ * proxies /api routes to the backend so the session cookie stays same-origin.
+ *
+ * Server components pass the session cookie as the optional `cookie` argument
+ * (e.g. `getMyOrders(cookie)`), so the backend knows who is making the request.
  */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import type {
-  Category,
-  Event,
-  Order,
-  Review,
-  ScheduleItem,
-  Ticket,
-  TicketTier,
-  User,
-} from "@/types";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api";
+// ─── Events ────────────────────────────────────────────────────────────────
 
-export class ApiError extends Error {}
-
-async function api<T>(path: string, options: RequestInit = {}, cookie?: string): Promise<T> {
-  let res: Response;
+export const getEvents = async (cookie?: string) => {
   try {
-    res = await fetch(`${API_URL}${path}`, {
-      ...options,
+    const response = await fetch(`${API_URL}/events`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch events:", error);
+    throw error;
+  }
+};
+
+export const getEvent = async (idOrSlug: string, cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/events/${encodeURIComponent(idOrSlug)}`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch event:", error);
+    throw error;
+  }
+};
+
+export const createEvent = async (data: Record<string, unknown>) => {
+  try {
+    const response = await fetch(`${API_URL}/events`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to create event:", error);
+    throw error;
+  }
+};
+
+export const updateEvent = async (eventId: string, data: Record<string, unknown>, cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/events/${encodeURIComponent(eventId)}`, {
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
         ...(cookie ? { cookie } : {}),
-        ...options.headers,
       },
+      body: JSON.stringify(data),
       credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to update event:", error);
+    throw error;
+  }
+};
+
+export const createTier = async (eventId: string, data: { name: string; price: number; perks?: string }) => {
+  try {
+    const response = await fetch(`${API_URL}/events/${encodeURIComponent(eventId)}/tiers`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to create tier:", error);
+    throw error;
+  }
+};
+
+export const createScheduleItem = async (
+  eventId: string,
+  data: { time: string; title: string; speaker?: string }
+) => {
+  try {
+    const response = await fetch(`${API_URL}/events/${encodeURIComponent(eventId)}/schedule`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to create schedule item:", error);
+    throw error;
+  }
+};
+
+// ─── Categories ────────────────────────────────────────────────────────────
+
+export const getCategories = async (cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/categories`, {
+      ...(cookie ? { headers: { cookie } } : {}),
       cache: "no-store",
     });
-  } catch {
-    throw new ApiError("Cannot reach the server. Is the backend running?");
-  }
 
-  let body: { success: boolean; message?: string; data?: T };
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch categories:", error);
+    throw error;
+  }
+};
+
+// ─── Orders ────────────────────────────────────────────────────────────────
+
+export const createOrder = async (data: { eventId: string; quantity: number; tierId?: string; attendeeName?: string }) => {
   try {
-    body = await res.json();
-  } catch {
-    throw new ApiError(`Server returned an unexpected response (${res.status})`);
+    const response = await fetch(`${API_URL}/orders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to create order:", error);
+    throw error;
   }
+};
 
-  if (!res.ok || !body.success) {
-    throw new ApiError(body.message ?? "Something went wrong");
+export const getMyOrders = async (cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/orders`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch orders:", error);
+    throw error;
   }
+};
 
-  return body.data as T;
-}
+export const getOrganizerOrders = async (cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/orders/organizer`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+      credentials: "include",
+    });
 
-// ─── Mappers: API rows → EventHub domain types ────────────────────────────
+    const result = await response.json();
 
-export function initials(name: string): string {
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  const first = parts[0]?.[0] ?? "";
-  const last = parts[1]?.[0] ?? "";
-  return (first + last).toUpperCase() || "U";
-}
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
 
-function mapUser(raw: any): User {
-  return {
-    id: raw.id,
-    name: raw.name,
-    email: raw.email,
-    role: raw.role,
-    status: String(raw.status ?? "ACTIVE").toLowerCase() as User["status"],
-    avatarUrl: raw.image ?? undefined,
-    initials: initials(raw.name),
-    joinedAt: raw.createdAt ? String(raw.createdAt).slice(0, 10) : "",
-    bio: raw.bio ?? undefined,
-    city: raw.city ?? undefined,
-  };
-}
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch organizer orders:", error);
+    throw error;
+  }
+};
 
-function mapCategory(raw: any): Category {
-  return {
-    id: raw.id,
-    slug: raw.slug,
-    name: raw.name,
-    description: raw.description ?? "",
-    icon: raw.icon ?? "Cpu",
-    eventCount: raw._count?.events ?? 0,
-  };
-}
+// ─── Tickets ───────────────────────────────────────────────────────────────
 
-function mapScheduleItem(raw: any): ScheduleItem {
-  return {
-    id: raw.id,
-    time: raw.time,
-    title: raw.title,
-    speaker: raw.speaker ?? undefined,
-  };
-}
+export const getMyTickets = async (cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/tickets`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+      credentials: "include",
+    });
 
-function mapTicketTier(raw: any): TicketTier {
-  return {
-    id: raw.id,
-    name: raw.name,
-    price: raw.price,
-    perks: raw.perks ?? "",
-  };
-}
+    const result = await response.json();
 
-function mapEvent(raw: any): Event {
-  return {
-    id: raw.id,
-    slug: raw.slug,
-    title: raw.title,
-    shortDescription: raw.shortDescription ?? "",
-    description: raw.description,
-    imageUrl: raw.imageUrl ?? "",
-    categorySlug: raw.category?.slug ?? "general",
-    organizerId: raw.organizerId,
-    organizerName: raw.organizer?.name ?? "Organizer",
-    date: raw.date,
-    startTime: raw.startTime,
-    endTime: raw.endTime,
-    venue: raw.venue,
-    address: raw.address ?? "",
-    city: raw.city,
-    price: raw.price,
-    capacity: raw.capacity,
-    ticketsSold: raw.ticketsSold,
-    status: String(raw.status ?? "UPCOMING").toLowerCase() as Event["status"],
-    featured: raw.featured,
-    popularity: raw.popularity,
-    rating: raw.rating,
-    reviewCount: raw.reviewCount,
-    schedule: (raw.schedule ?? []).map(mapScheduleItem),
-    tiers: (raw.tiers ?? []).map(mapTicketTier),
-  };
-}
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
 
-function mapOrder(raw: any): Order {
-  return {
-    id: raw.id,
-    eventId: raw.eventId,
-    eventTitle: raw.event?.title ?? "Event",
-    customerId: raw.customerId,
-    customerName: raw.customerName,
-    customerEmail: raw.customerEmail,
-    quantity: raw.quantity,
-    amount: raw.amount,
-    status: String(raw.status ?? "PENDING").toLowerCase() as Order["status"],
-    paymentStatus: String(raw.paymentStatus ?? "UNPAID").toLowerCase() as Order["paymentStatus"],
-    createdAt: raw.createdAt,
-  };
-}
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch tickets:", error);
+    throw error;
+  }
+};
 
-function mapTicket(raw: any): Ticket {
-  const status = String(raw.status ?? "ACTIVE").toUpperCase();
-  return {
-    id: raw.id,
-    orderId: raw.orderId,
-    eventId: raw.eventId,
-    userId: raw.userId,
-    attendeeName: raw.attendeeName,
-    tierName: raw.tierName,
-    quantity: raw.quantity,
-    status:
-      status === "ACTIVE"
-        ? "valid"
-        : status === "USED"
-          ? "used"
-          : "refunded",
-    purchasedAt: raw.purchasedAt,
-    ...(raw.event ? { event: mapEvent(raw.event) } : {}),
-  };
-}
+// ─── Reviews ───────────────────────────────────────────────────────────────
 
-function mapReview(raw: any): Review {
-  const name = raw.user?.name ?? "Attendee";
-  return {
-    id: raw.id,
-    eventId: raw.eventId,
-    userId: raw.userId,
-    userName: name,
-    userInitials: initials(name),
-    rating: raw.rating,
-    comment: raw.comment ?? "",
-    createdAt: raw.createdAt,
-  };
-}
+export const getEventReviews = async (eventId: string, cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/reviews/event/${encodeURIComponent(eventId)}`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+    });
 
-// ─── Public data (no auth needed) ──────────────────────────────────────────
+    const result = await response.json();
 
-export async function getEvents(cookie?: string): Promise<Event[]> {
-  return (await api<any[]>("/events", {}, cookie)).map(mapEvent);
-}
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
 
-export async function getEvent(idOrSlug: string, cookie?: string): Promise<Event> {
-  return mapEvent(await api<any>(`/events/${encodeURIComponent(idOrSlug)}`, {}, cookie));
-}
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch reviews:", error);
+    throw error;
+  }
+};
 
-export async function getCategories(cookie?: string): Promise<Category[]> {
-  return (await api<any[]>("/categories", {}, cookie)).map(mapCategory);
-}
+export const createReview = async (data: { eventId: string; rating: number; comment?: string }) => {
+  try {
+    const response = await fetch(`${API_URL}/reviews`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
 
-export async function getOrganizer(id: string, cookie?: string): Promise<{ organizer: User; events: Event[] }> {
-  const raw = await api<any>(`/organizers/${encodeURIComponent(id)}`, {}, cookie);
-  return { organizer: mapUser(raw.organizer), events: raw.events.map(mapEvent) };
-}
+    const result = await response.json();
 
-export async function getOrganizerStats(
-  id: string,
-  cookie?: string
-): Promise<{ totalEvents: number; totalOrders: number; totalTicketsSold: number; totalRevenue: number }> {
-  return await api<any>(`/organizers/${encodeURIComponent(id)}/stats`, {}, cookie);
-}
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
 
-// ─── Authenticated user data (session cookie is sent automatically) ───────
+    return result.data;
+  } catch (error) {
+    console.error("Failed to create review:", error);
+    throw error;
+  }
+};
 
-export async function updateUser(id: string, data: Record<string, unknown>, cookie?: string): Promise<User> {
-  return mapUser(await api<any>(`/users/${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify(data) }, cookie));
-}
+// ─── User ──────────────────────────────────────────────────────────────────
 
-export async function updateUserRole(id: string, role: User["role"], cookie?: string): Promise<User> {
-  return mapUser(
-    await api<any>(`/users/${encodeURIComponent(id)}/role`, { method: "PATCH", body: JSON.stringify({ role }) }, cookie),
-  );
-}
+export const getUser = async (id: string, cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/users/${encodeURIComponent(id)}`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+    });
 
-export async function getMyOrders(cookie?: string): Promise<Order[]> {
-  return (await api<any[]>("/orders", {}, cookie)).map(mapOrder);
-}
+    const result = await response.json();
 
-export async function getOrganizerOrders(cookie?: string): Promise<Order[]> {
-  return (await api<any[]>("/orders/organizer", {}, cookie)).map(mapOrder);
-}
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
 
-export async function getMyTickets(cookie?: string): Promise<Ticket[]> {
-  return (await api<any[]>("/tickets", {}, cookie)).map(mapTicket);
-}
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch user:", error);
+    throw error;
+  }
+};
 
-export async function createOrder(
-  data: { eventId: string; quantity: number; tierId?: string; attendeeName?: string },
-  cookie?: string
-): Promise<{ order: Order; ticket: Ticket }> {
-  const raw = await api<any>("/orders", { method: "POST", body: JSON.stringify(data) }, cookie);
-  return { order: mapOrder(raw.order), ticket: mapTicket(raw.ticket) };
-}
+export const updateUser = async (id: string, data: Record<string, unknown>, cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/users/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...(cookie ? { cookie } : {}),
+      },
+      body: JSON.stringify(data),
+      credentials: "include",
+    });
 
-export async function createEvent(
-  data: Record<string, unknown>,
-  cookie?: string
-): Promise<Event> {
-  return mapEvent(await api<any>("/events", { method: "POST", body: JSON.stringify(data) }, cookie));
-}
+    const result = await response.json();
 
-export async function createTier(
-  eventId: string,
-  data: { name: string; price: number; perks?: string },
-  cookie?: string
-): Promise<TicketTier> {
-  return mapTicketTier(await api<any>(`/events/${encodeURIComponent(eventId)}/tiers`, { method: "POST", body: JSON.stringify(data) }, cookie));
-}
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
 
-export async function createScheduleItem(
-  eventId: string,
-  data: { time: string; title: string; speaker?: string },
-  cookie?: string
-): Promise<ScheduleItem> {
-  return mapScheduleItem(await api<any>(`/events/${encodeURIComponent(eventId)}/schedule`, { method: "POST", body: JSON.stringify(data) }, cookie));
-}
+    return result.data;
+  } catch (error) {
+    console.error("Failed to update user:", error);
+    throw error;
+  }
+};
 
-export async function createReview(
-  data: { eventId: string; rating: number; comment?: string },
-  cookie?: string
-): Promise<Review> {
-  return mapReview(await api<any>("/reviews", { method: "POST", body: JSON.stringify(data) }, cookie));
-}
+export const updateUserRole = async (id: string, role: string, cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/users/${encodeURIComponent(id)}/role`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...(cookie ? { cookie } : {}),
+      },
+      body: JSON.stringify({ role }),
+      credentials: "include",
+    });
 
-export async function getEventReviews(eventId: string, cookie?: string): Promise<Review[]> {
-  return (await api<any[]>(`/reviews/event/${encodeURIComponent(eventId)}`, {}, cookie)).map(mapReview);
-}
+    const result = await response.json();
 
-// ─── Admin (backend enforces the admin role) ───────────────────────────────
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
 
-export async function getAdminStats(
-  cookie?: string
-): Promise<{
-  totalUsers: number;
-  totalOrganizers: number;
-  totalEvents: number;
-  totalOrders: number;
-  totalTickets: number;
-  totalTicketsSold: number;
-  totalRevenue: number;
-}> {
-  return await api<any>("/admin/stats", {}, cookie);
-}
+    return result.data;
+  } catch (error) {
+    console.error("Failed to update user role:", error);
+    throw error;
+  }
+};
 
-export async function getAdminUsers(cookie?: string): Promise<User[]> {
-  return (await api<any[]>("/admin/users", {}, cookie)).map(mapUser);
-}
+// ─── Organizer ─────────────────────────────────────────────────────────────
 
-export async function getAdminEvents(cookie?: string): Promise<Event[]> {
-  return (await api<any[]>("/admin/events", {}, cookie)).map(mapEvent);
-}
+export const getOrganizer = async (id: string, cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/organizers/${encodeURIComponent(id)}`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+    });
 
-export async function getAdminOrders(cookie?: string): Promise<Order[]> {
-  return (await api<any[]>("/admin/orders", {}, cookie)).map(mapOrder);
-}
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch organizer:", error);
+    throw error;
+  }
+};
+
+export const getOrganizerStats = async (id: string, cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/organizers/${encodeURIComponent(id)}/stats`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch organizer stats:", error);
+    throw error;
+  }
+};
+
+// ─── Admin ─────────────────────────────────────────────────────────────────
+
+export const getAdminStats = async (cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/admin/stats`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch admin stats:", error);
+    throw error;
+  }
+};
+
+export const getAdminUsers = async (cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/admin/users`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch admin users:", error);
+    throw error;
+  }
+};
+
+export const getAdminEvents = async (cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/admin/events`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch admin events:", error);
+    throw error;
+  }
+};
+
+export const getAdminOrders = async (cookie?: string) => {
+  try {
+    const response = await fetch(`${API_URL}/admin/orders`, {
+      ...(cookie ? { headers: { cookie } } : {}),
+      cache: "no-store",
+      credentials: "include",
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.message);
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Failed to fetch admin orders:", error);
+    throw error;
+  }
+};

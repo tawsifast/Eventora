@@ -20,6 +20,7 @@ export interface User {
   joinedAt: string;
   bio?: string;
   city?: string;
+  createdAt?: string;
 }
 
 export interface Category {
@@ -29,6 +30,7 @@ export interface Category {
   description: string;
   icon: string;
   eventCount: number;
+  _count?: { events?: number };
 }
 
 export type EventStatus = "upcoming" | "ongoing" | "completed" | "cancelled";
@@ -73,6 +75,8 @@ export interface Event {
   reviewCount: number;
   schedule: ScheduleItem[];
   tiers: TicketTier[];
+  category?: { slug?: string; name?: string };
+  organizer?: { name?: string; id?: string };
 }
 
 export interface Review {
@@ -84,6 +88,7 @@ export interface Review {
   rating: number;
   comment: string;
   createdAt: string;
+  user?: { name?: string };
 }
 
 export type OrderStatus = "pending" | "confirmed" | "cancelled";
@@ -101,6 +106,7 @@ export interface Order {
   status: OrderStatus;
   paymentStatus: PaymentStatus;
   createdAt: string;
+  event?: { title?: string };
 }
 
 export type TicketStatus = "valid" | "used" | "refunded";
