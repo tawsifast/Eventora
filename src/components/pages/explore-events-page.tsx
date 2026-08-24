@@ -22,6 +22,7 @@ import { Slider } from "@/components/ui/slider";
 import type { Category, Event, EventStatus } from "@/types";
 
 const PER_PAGE = 6;
+const DEFAULT_PRICE_CEILING = 80;
 
 export function ExploreEventsPage({
   initialQuery = "",
@@ -36,11 +37,24 @@ export function ExploreEventsPage({
 }) {
   const router = useRouter();
 
+  // Derive the slider's ceiling from the actual event prices instead of a
+  // hardcoded value, so events priced above any fixed guess never get
+  // silently filtered out. Falls back to DEFAULT_PRICE_CEILING when there
+  // are no events yet (or they're all free), and rounds up to a clean
+  // number so the slider doesn't show an odd max like 353.
+  const priceCeiling = useMemo(() => {
+    if (events.length === 0) return DEFAULT_PRICE_CEILING;
+    const highest = Math.max(...events.map((e) => e.price));
+    if (highest <= 0) return DEFAULT_PRICE_CEILING;
+    // round up to the nearest 10 above the highest price
+    return Math.max(DEFAULT_PRICE_CEILING, Math.ceil(highest / 10) * 10);
+  }, [events]);
+
   const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState(initialCategory);
   const [status, setStatus] = useState<EventStatus | "all">("all");
   const [dateRange, setDateRange] = useState("all");
-  const [maxPrice, setMaxPrice] = useState(80);
+  const [maxPrice, setMaxPrice] = useState(priceCeiling);
   const [sort, setSort] = useState("soonest");
   const [page, setPage] = useState(1);
 
@@ -94,7 +108,7 @@ export function ExploreEventsPage({
     setCategory("all");
     setStatus("all");
     setDateRange("all");
-    setMaxPrice(80);
+    setMaxPrice(priceCeiling);
     setSort("soonest");
     setPage(1);
     router.replace("/events");
@@ -183,9 +197,9 @@ export function ExploreEventsPage({
             <Slider
               value={[maxPrice]}
               min={0}
-              max={80}
-              step={5}
-              onValueChange={([v]) => setMaxPrice(v ?? 80)}
+              max={priceCeiling}
+              step={Math.max(5, Math.round(priceCeiling / 20))}
+              onValueChange={([v]) => setMaxPrice(v ?? priceCeiling)}
               aria-label="Maximum price"
             />
           </div>

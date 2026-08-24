@@ -23,7 +23,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const role = (session.user as AuthUser).role ?? "user";
+  const role = (session.user as AuthUser).role?.toLowerCase() ?? "user";
   if (!guard.roles.includes(role)) {
     const url = request.nextUrl.clone();
     url.pathname = "/unauthorized";

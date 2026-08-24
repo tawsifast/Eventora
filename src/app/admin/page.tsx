@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { CalendarDays, DollarSign, Ticket, Users } from "lucide-react";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AdminUsersTable } from "@/components/admin/users-table";
@@ -9,8 +8,9 @@ import { DashboardShell } from "@/components/dashboard-shell";
 import { PageHeader } from "@/components/section-heading";
 import { StatCard } from "@/components/stat-card";
 import { EventStatusBadge, OrderStatusBadge } from "@/components/status-badges";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "@/components/ui/table";
 import { getAdminEvents, getAdminOrders, getAdminStats, getAdminUsers } from "@/lib/api";
+import { getServerToken } from "@/lib/server-token";
 import { formatCurrency, formatDate, formatNumber } from "@/lib/format";
 import { getCurrentUser } from "@/lib/session";
 import type { Event, Order, User } from "@/types";
@@ -31,7 +31,7 @@ export default async function AdminPage() {
   if (!currentUser) redirect("/login");
   if (currentUser.role !== "admin") redirect("/unauthorized");
 
-  const cookie = (await cookies()).toString();
+  const token = await getServerToken();
   let stats = {
     totalUsers: 0,
     totalOrganizers: 0,
@@ -44,10 +44,10 @@ export default async function AdminPage() {
   let allOrders: Order[] = [];
   try {
     [stats, allEvents, allUsers, allOrders] = await Promise.all([
-      getAdminStats(cookie),
-      getAdminEvents(cookie),
-      getAdminUsers(cookie),
-      getAdminOrders(cookie),
+      getAdminStats(token),
+      getAdminEvents(token),
+      getAdminUsers(token),
+      getAdminOrders(token),
     ]);
   } catch {
     stats = { totalUsers: 0, totalOrganizers: 0, totalEvents: 0, totalTicketsSold: 0, totalRevenue: 0 };

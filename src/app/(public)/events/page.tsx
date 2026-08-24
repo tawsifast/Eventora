@@ -31,6 +31,9 @@ export default async function Page({
     // backend offline — the page renders with empty data
   }
 
+  console.log(events, "event")
+
+
   return (
     <ExploreEventsPage initialQuery={q ?? ""} initialCategory={category ?? "all"} events={events} categories={categories} />
   );

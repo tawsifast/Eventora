@@ -8,22 +8,70 @@
  *   4. returns result.data
  *   5. throws Error(result.message) when the request fails
  *
- * `NEXT_PUBLIC_API_URL` points to the backend in development
- * (http://localhost:5000/api) and is empty in production, where Next.js
- * proxies /api routes to the backend so the session cookie stays same-origin.
+ * `NEXT_PUBLIC_SERVER_URL` points to the backend API base URL.
+ * If empty, Next.js rewrites `/api/*` to the backend (same-origin).
  *
- * Server components pass the session cookie as the optional `cookie` argument
- * (e.g. `getMyOrders(cookie)`), so the backend knows who is making the request.
+ * Token handling:
+ * - If `token` is explicitly provided → `Authorization: Bearer ${token}` header
+ * - If `token` is omitted and running in browser → auto-inject via `authClient.token()`
+ * - If `token` is omitted and NOT in browser (RSC) → no auth header (public endpoints)
  */
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
+import { authClient } from "./auth-client";
+
+const API_URL = process.env.NEXT_PUBLIC_SERVER_URL || "";
+
+// 👇 Auto‑inject helper (async because it may fetch a token)
+export async function getAccessToken(): Promise<string | null> {
+  try {
+    if (typeof window !== "undefined") {
+      const { data } = await authClient.token();
+      return data?.token ?? null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export async function buildAuthHeaders(token?: string): Promise<HeadersInit> {
+  const h: HeadersInit = {
+    "Content-Type": "application/json",
+    // Always include cookies so server components (RSC) forward the
+    // Better Auth session cookie to the backend, which verifies it via
+    // the Prisma adapter. This restores the original session-based flow
+    // for public pages, dashboard pages, etc.
+    credentials: "include" as const,
+  };
+  // If an explicit token is supplied (e.g. from getServerToken / getAccessToken),
+  // add a Bearer header so the backend's JWT verification path runs.
+  // This is used by /admin and /organizer protected pages when they
+  // explicitly pass a token, while still also sending the cookie jar.
+  if (token) {
+    h.authorization = `Bearer ${token}`;
+  } else if (typeof window !== "undefined") {
+    // Browser-only: auto-inject the Better Auth JWT token so that
+    // client‑side fetch calls (e.g. from use client components) also get
+    // authenticated when no explicit token is passed.
+    try {
+      const { data } = await authClient.token();
+      if (data?.token) {
+        h.authorization = `Bearer ${data.token}`;
+      }
+    } catch {
+      // Silently fall back – the cookie will still authenticate the user.
+    }
+  }
+  return h;
+}
 
 // ─── Events ────────────────────────────────────────────────────────────────
 
-export const getEvents = async (cookie?: string) => {
+export const getEvents = async (idOrSlug?: string, token?: string) => {
   try {
-    const response = await fetch(`${API_URL}/events`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+    const headers = await buildAuthHeaders(token);
+    const response = await fetch(`${API_URL}/events${idOrSlug ? `/${encodeURIComponent(idOrSlug)}` : ""}`, {
+      headers,
       cache: "no-store",
     });
 
@@ -40,10 +88,11 @@ export const getEvents = async (cookie?: string) => {
   }
 };
 
-export const getEvent = async (idOrSlug: string, cookie?: string) => {
+export const getEvent = async (idOrSlug: string, token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/events/${encodeURIComponent(idOrSlug)}`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
     });
 
@@ -60,15 +109,13 @@ export const getEvent = async (idOrSlug: string, cookie?: string) => {
   }
 };
 
-export const createEvent = async (data: Record<string, unknown>) => {
+export const createEvent = async (data: Record<string, unknown>, token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/events`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(data),
-      credentials: "include",
     });
 
     const result = await response.json();
@@ -84,16 +131,13 @@ export const createEvent = async (data: Record<string, unknown>) => {
   }
 };
 
-export const updateEvent = async (eventId: string, data: Record<string, unknown>, cookie?: string) => {
+export const updateEvent = async (eventId: string, data: Record<string, unknown>, token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/events/${encodeURIComponent(eventId)}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        ...(cookie ? { cookie } : {}),
-      },
+      headers,
       body: JSON.stringify(data),
-      credentials: "include",
     });
 
     const result = await response.json();
@@ -109,15 +153,13 @@ export const updateEvent = async (eventId: string, data: Record<string, unknown>
   }
 };
 
-export const createTier = async (eventId: string, data: { name: string; price: number; perks?: string }) => {
+export const createTier = async (eventId: string, data: { name: string; price: number; perks?: string }, token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/events/${encodeURIComponent(eventId)}/tiers`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(data),
-      credentials: "include",
     });
 
     const result = await response.json();
@@ -135,16 +177,15 @@ export const createTier = async (eventId: string, data: { name: string; price: n
 
 export const createScheduleItem = async (
   eventId: string,
-  data: { time: string; title: string; speaker?: string }
+  data: { time: string; title: string; speaker?: string },
+  token?: string
 ) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/events/${encodeURIComponent(eventId)}/schedule`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(data),
-      credentials: "include",
     });
 
     const result = await response.json();
@@ -162,10 +203,11 @@ export const createScheduleItem = async (
 
 // ─── Categories ────────────────────────────────────────────────────────────
 
-export const getCategories = async (cookie?: string) => {
+export const getCategories = async (token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/categories`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
     });
 
@@ -184,15 +226,16 @@ export const getCategories = async (cookie?: string) => {
 
 // ─── Orders ────────────────────────────────────────────────────────────────
 
-export const createOrder = async (data: { eventId: string; quantity: number; tierId?: string; attendeeName?: string }) => {
+export const createOrder = async (
+  data: { eventId: string; quantity: number; tierId?: string; attendeeName?: string },
+  token?: string
+) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/orders`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(data),
-      credentials: "include",
     });
 
     const result = await response.json();
@@ -208,10 +251,11 @@ export const createOrder = async (data: { eventId: string; quantity: number; tie
   }
 };
 
-export const getMyOrders = async (cookie?: string) => {
+export const getMyOrders = async (token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/orders`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
       credentials: "include",
     });
@@ -229,10 +273,11 @@ export const getMyOrders = async (cookie?: string) => {
   }
 };
 
-export const getOrganizerOrders = async (cookie?: string) => {
+export const getOrganizerOrders = async (token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/orders/organizer`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
       credentials: "include",
     });
@@ -252,10 +297,11 @@ export const getOrganizerOrders = async (cookie?: string) => {
 
 // ─── Tickets ───────────────────────────────────────────────────────────────
 
-export const getMyTickets = async (cookie?: string) => {
+export const getMyTickets = async (token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/tickets`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
       credentials: "include",
     });
@@ -275,10 +321,11 @@ export const getMyTickets = async (cookie?: string) => {
 
 // ─── Reviews ───────────────────────────────────────────────────────────────
 
-export const getEventReviews = async (eventId: string, cookie?: string) => {
+export const getEventReviews = async (eventId: string, token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/reviews/event/${encodeURIComponent(eventId)}`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
     });
 
@@ -295,15 +342,13 @@ export const getEventReviews = async (eventId: string, cookie?: string) => {
   }
 };
 
-export const createReview = async (data: { eventId: string; rating: number; comment?: string }) => {
+export const createReview = async (data: { eventId: string; rating: number; comment?: string }, token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/reviews`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(data),
-      credentials: "include",
     });
 
     const result = await response.json();
@@ -321,10 +366,11 @@ export const createReview = async (data: { eventId: string; rating: number; comm
 
 // ─── User ──────────────────────────────────────────────────────────────────
 
-export const getUser = async (id: string, cookie?: string) => {
+export const getUser = async (id: string, token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/users/${encodeURIComponent(id)}`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
     });
 
@@ -341,16 +387,13 @@ export const getUser = async (id: string, cookie?: string) => {
   }
 };
 
-export const updateUser = async (id: string, data: Record<string, unknown>, cookie?: string) => {
+export const updateUser = async (id: string, data: Record<string, unknown>, token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/users/${encodeURIComponent(id)}`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        ...(cookie ? { cookie } : {}),
-      },
+      headers,
       body: JSON.stringify(data),
-      credentials: "include",
     });
 
     const result = await response.json();
@@ -366,16 +409,13 @@ export const updateUser = async (id: string, data: Record<string, unknown>, cook
   }
 };
 
-export const updateUserRole = async (id: string, role: string, cookie?: string) => {
+export const updateUserRole = async (id: string, role: string, token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/users/${encodeURIComponent(id)}/role`, {
       method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        ...(cookie ? { cookie } : {}),
-      },
+      headers,
       body: JSON.stringify({ role }),
-      credentials: "include",
     });
 
     const result = await response.json();
@@ -393,10 +433,11 @@ export const updateUserRole = async (id: string, role: string, cookie?: string) 
 
 // ─── Organizer ─────────────────────────────────────────────────────────────
 
-export const getOrganizer = async (id: string, cookie?: string) => {
+export const getOrganizer = async (id: string, token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/organizers/${encodeURIComponent(id)}`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
     });
 
@@ -413,10 +454,11 @@ export const getOrganizer = async (id: string, cookie?: string) => {
   }
 };
 
-export const getOrganizerStats = async (id: string, cookie?: string) => {
+export const getOrganizerStats = async (id: string, token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/organizers/${encodeURIComponent(id)}/stats`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
       credentials: "include",
     });
@@ -436,10 +478,11 @@ export const getOrganizerStats = async (id: string, cookie?: string) => {
 
 // ─── Admin ─────────────────────────────────────────────────────────────────
 
-export const getAdminStats = async (cookie?: string) => {
+export const getAdminStats = async (token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/admin/stats`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
       credentials: "include",
     });
@@ -457,10 +500,11 @@ export const getAdminStats = async (cookie?: string) => {
   }
 };
 
-export const getAdminUsers = async (cookie?: string) => {
+export const getAdminUsers = async (token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/admin/users`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
       credentials: "include",
     });
@@ -478,10 +522,11 @@ export const getAdminUsers = async (cookie?: string) => {
   }
 };
 
-export const getAdminEvents = async (cookie?: string) => {
+export const getAdminEvents = async (token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/admin/events`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
       credentials: "include",
     });
@@ -499,10 +544,11 @@ export const getAdminEvents = async (cookie?: string) => {
   }
 };
 
-export const getAdminOrders = async (cookie?: string) => {
+export const getAdminOrders = async (token?: string) => {
   try {
+    const headers = await buildAuthHeaders(token);
     const response = await fetch(`${API_URL}/admin/orders`, {
-      ...(cookie ? { headers: { cookie } } : {}),
+      headers,
       cache: "no-store",
       credentials: "include",
     });

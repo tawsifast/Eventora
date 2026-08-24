@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { CalendarDays, CalendarPlus, DollarSign, Receipt, Ticket, Users } from "lucide-react";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { DashboardShell } from "@/components/dashboard-shell";
@@ -11,8 +10,9 @@ import { EmptyState } from "@/components/states";
 import { EventStatusBadge, OrderStatusBadge } from "@/components/status-badges";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHeader, TableHead, TableRow } from "@/components/ui/table";
 import { getEvents, getOrganizerOrders, getOrganizerStats } from "@/lib/api";
+import { getServerToken } from "@/lib/server-token";
 import { formatCurrency, formatDate, formatNumber } from "@/lib/format";
 import { getCurrentUser } from "@/lib/session";
 import type { Event, Order } from "@/types";
@@ -36,18 +36,18 @@ export default async function OrganizerDashboard() {
   if (!currentUser) redirect("/login");
   if (currentUser.role !== "organizer" && currentUser.role !== "admin") redirect("/unauthorized");
 
-  const cookie = (await cookies()).toString();
+  const token = await getServerToken();
   let myEvents: Event[] = [];
   let recentOrders: Order[] = [];
   let stats = { totalEvents: 0, totalTicketsSold: 0, totalRevenue: 0 };
   try {
     const [allEvents, orders]: [Event[], Order[]] = await Promise.all([
-      getEvents(cookie),
-      getOrganizerOrders(cookie).catch(() => [] as Order[]),
+      getEvents(token),
+      getOrganizerOrders(token).catch(() => [] as Order[]),
     ]);
     myEvents = allEvents.filter((e) => e.organizerId === currentUser.id);
     recentOrders = orders.slice(0, 6);
-    stats = await getOrganizerStats(currentUser.id, cookie).catch(() => stats);
+    stats = await getOrganizerStats(currentUser.id, token).catch(() => stats);
   } catch {
     stats = { totalEvents: 0, totalTicketsSold: 0, totalRevenue: 0 };
   }

@@ -7,41 +7,38 @@ datasource db {
   provider = "postgresql"
 }
 
-
-
-model users {
-  id       String   @id
-  name     String
-  userName String
-  email    String
-  password String
-  role     UserRole @default(USER)
-  avatar   String?
-
-  @@unique([email, userName])
-  @@index([email, userName])
-}
-
 model User {
-  id            String    @id
+  id            String    @id @default(uuid())
   name          String
-  email         String
+  email         String    @unique
   emailVerified Boolean   @default(false)
   image         String?
   role          String    @default("user")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
   sessions      Session[]
   accounts      Account[]
+  events        Event[]
+  orders        Order[]     @relation("UserOrders")
+  tickets       Ticket[]
+  reviews       Review[]
 
-  @@unique([email])
+  userName      String?   @unique
+  status        UserStatus @default(ACTIVE)
+  bio           String?
+  city          String?
+  isDeleted     Boolean   @default(false)
+
+  @@index([role])
+  @@index([status])
   @@map("user")
 }
 
 model Session {
-  id        String   @id
+  id        String   @id @default(uuid())
   expiresAt DateTime
-  token     String
+  token     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   ipAddress String?
@@ -49,13 +46,12 @@ model Session {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
   @@index([userId])
   @@map("session")
 }
 
 model Account {
-  id                    String    @id
+  id                    String    @id @default(uuid())
   accountId             String
   providerId            String
   userId                String
@@ -75,7 +71,7 @@ model Account {
 }
 
 model Verification {
-  id         String   @id
+  id         String   @id @default(uuid())
   identifier String
   value      String
   expiresAt  DateTime
@@ -84,6 +80,178 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model jwks {
+  id         String   @id @default(uuid())
+  publicKey  String
+  privateKey String
+  createdAt  DateTime @default(now())
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  name        String
+  description String?
+  icon        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isDeleted   Boolean  @default(false)
+
+  events Event[]
+
+  @@index([isDeleted])
+  @@map("categories")
+}
+
+model Event {
+  id               String      @id @default(uuid())
+  slug             String      @unique
+  title            String
+  shortDescription String?
+  description      String
+  imageUrl         String?
+  categoryId       String?
+  category         Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  organizerId      String
+  organizer        User        @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  date             String
+  startTime        String
+  endTime          String
+  venue            String
+  address          String?
+  city             String
+  price            Int
+  capacity         Int
+  ticketsSold      Int         @default(0)
+  status           EventStatus @default(UPCOMING)
+  featured         Boolean     @default(false)
+  popularity       Int         @default(0)
+  rating           Float       @default(0)
+  reviewCount      Int         @default(0)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  isDeleted        Boolean     @default(false)
+
+  schedule ScheduleItem[]
+  tiers    TicketTier[]
+  orders   Order[]
+  tickets  Ticket[]
+  reviews  Review[]
+
+  @@index([organizerId])
+  @@index([categoryId])
+  @@index([status, isDeleted])
+  @@index([date])
+  @@index([isDeleted])
+  @@map("event")
+}
+
+model TicketTier {
+  id        String   @id @default(uuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name      String
+  price     Int
+  perks     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  @@index([eventId])
+  @@index([isDeleted])
+  @@map("ticket_tiers")
+}
+
+model ScheduleItem {
+  id          String   @id @default(uuid())
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  time        String
+  title       String
+  speaker     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isDeleted   Boolean  @default(false)
+
+  @@index([eventId])
+  @@index([isDeleted])
+  @@map("schedule_items")
+}
+
+model Order {
+  id            String        @id @default(uuid())
+  eventId       String
+  event         Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  customerId    String
+  customer      User          @relation("UserOrders", fields: [customerId], references: [id], onDelete: Cascade)
+  customerName  String
+  customerEmail String
+  quantity      Int
+  amount        Int
+  status        OrderStatus   @default(PENDING)
+  paymentStatus PaymentStatus @default(UNPAID)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  isDeleted     Boolean       @default(false)
+
+  tickets Ticket[]
+
+  @@index([customerId])
+  @@index([eventId])
+  @@index([status, isDeleted])
+  @@index([isDeleted])
+  @@map("orders")
+}
+
+model Ticket {
+  id           String       @id @default(uuid())
+  orderId      String
+  order        Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  eventId      String
+  event        Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attendeeName String
+  tierName     String
+  quantity     Int
+  status       TicketStatus @default(ACTIVE)
+  purchasedAt  DateTime     @default(now())
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  isDeleted    Boolean      @default(false)
+
+  @@index([userId])
+  @@index([eventId])
+  @@index([orderId])
+  @@index([status, isDeleted])
+  @@index([isDeleted])
+  @@map("tickets")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDeleted Boolean  @default(false)
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+  @@index([isDeleted])
+  @@map("reviews")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
 }
 
 enum EventStatus {
@@ -116,5 +284,3 @@ enum UserRole {
   ORGANIZER
   ADMIN
 }
-
-

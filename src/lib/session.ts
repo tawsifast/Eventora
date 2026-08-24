@@ -14,8 +14,14 @@ export interface SessionUser {
 export async function getCurrentUser(): Promise<SessionUser | null> {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session?.user) return null;
-  const role: UserRole =
-    session.user.role === "organizer" || session.user.role === "admin" ? session.user.role : "user";
+  const rawRole: string | null = session.user.role ?? null;
+  let role: UserRole = "user";
+  if (rawRole) {
+    const lower = rawRole.toLowerCase();
+    if (lower === "organizer") role = "organizer" as UserRole;
+    else if (lower === "admin") role = "admin" as UserRole;
+    else role = "user";
+  }
   return {
     id: session.user.id,
     name: session.user.name,

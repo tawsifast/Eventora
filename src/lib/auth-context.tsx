@@ -37,7 +37,9 @@ function toDomainUser(u: {
   createdAt: Date;
   role?: string | null;
 }): User {
-  const role: UserRole = u.role === "organizer" || u.role === "admin" ? u.role : "user";
+  const role: UserRole = u.role?.toLowerCase() === "organizer" || u.role?.toLowerCase() === "admin"
+      ? (u.role?.toLowerCase() as UserRole)
+      : "user";
   return {
     id: u.id,
     name: u.name,
