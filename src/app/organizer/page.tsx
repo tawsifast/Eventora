@@ -42,7 +42,7 @@ export default async function OrganizerDashboard() {
   let stats = { totalEvents: 0, totalTicketsSold: 0, totalRevenue: 0 };
   try {
     const [allEvents, orders]: [Event[], Order[]] = await Promise.all([
-      getEvents(token),
+      getEvents(undefined, token),
       getOrganizerOrders(token).catch(() => [] as Order[]),
     ]);
     myEvents = allEvents.filter((e) => e.organizerId === currentUser.id);
