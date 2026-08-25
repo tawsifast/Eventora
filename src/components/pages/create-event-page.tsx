@@ -36,14 +36,28 @@ export function CreateEventPage() {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [categoryId, setCategoryId] = useState("");
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [categoriesError, setCategoriesError] = useState(false);
+
   const [tiers, setTiers] = useState<TierDraft[]>([{ name: "General", price: "", perks: "" }]);
   const [schedule, setSchedule] = useState<ScheduleDraft[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    setLoadingCategories(true);
+    setCategoriesError(false);
     getCategories()
-      .then(setCategories)
-      .catch(() => toast.error("Could not load categories"));
+      .then((data) => {
+        setCategories(Array.isArray(data) ? data : []);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch categories:", err);
+        setCategoriesError(true);
+        toast.error("Could not load categories");
+      })
+      .finally(() => {
+        setLoadingCategories(false);
+      });
   }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -64,7 +78,7 @@ export function CreateEventPage() {
       price: Number(form.get("price") ?? 0),
       capacity: Number(form.get("capacity") ?? 0),
       imageUrl: String(form.get("imageUrl") ?? "").trim() || null,
-      categoryId: categoryId || null,
+      categoryId: categoryId.trim() ? categoryId : null,
     };
 
     const validTiers = tiers
@@ -159,20 +173,33 @@ export function CreateEventPage() {
               <Input id="address" name="address" placeholder="Level 12, 88 Gulshan Avenue" />
             </div>
           </div>
+
           <div className="space-y-2">
             <Label>Category</Label>
-            <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger aria-label="Category">
-                <SelectValue placeholder="Choose a category" />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {loadingCategories ? (
+              <div className="h-10 w-full animate-pulse rounded-md bg-muted" />
+            ) : categoriesError ? (
+              <p className="text-xs text-destructive">Failed to load categories</p>
+            ) : (
+              <Select value={categoryId} onValueChange={setCategoryId}>
+                <SelectTrigger aria-label="Category">
+                  <SelectValue placeholder="Choose a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.length > 0 ? (
+                    categories.map((c) => (
+                      <SelectItem key={c.id} value={String(c.id)}>
+                        {c.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-center text-xs text-muted-foreground">
+                      No categories available
+                    </div>
+                  )}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="space-y-3">
