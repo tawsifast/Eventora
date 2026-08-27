@@ -49,17 +49,17 @@ export function OrdersPage() {
   const totalSpent = all.reduce((sum, o) => (String(o.paymentStatus).toLowerCase() === "paid" ? sum + o.amount : sum), 0);
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-10 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-      <PageHeader
-        eyebrow="Purchase history"
-        title="Your Orders"
-        subtitle={`${loading ? "…" : all.length} orders · ${loading ? "…" : formatCurrency(totalSpent)} spent on EventHub`}
-        action={
-          <Button asChild variant="outline">
-            <Link href="/tickets">Open ticket wallet</Link>
-          </Button>
-        }
-      />
+    <div className="mx-auto w-full max-w-6xl space-y-8 px-4 py-8 sm:space-y-10 sm:px-6 sm:py-14 lg:px-8 overflow-x-hidden">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <PageHeader
+          eyebrow="Purchase history"
+          title="Your Orders"
+          subtitle={`${loading ? "…" : all.length} orders · ${loading ? "…" : formatCurrency(totalSpent)} spent on EventHub`}
+        />
+        <Button asChild variant="outline" className="w-full sm:w-auto shrink-0">
+          <Link href="/tickets">Open ticket wallet</Link>
+        </Button>
+      </div>
 
       {loading ? (
         <div className="space-y-3">
@@ -68,18 +68,14 @@ export function OrdersPage() {
         </div>
       ) : (
         <>
-          {/* flex-col on mobile stacks the search input and status filter
-             full-width, one per row — avoids the earlier grid-cols-[1fr_auto]
-             + child w-full combination, which mixes an auto-sized grid track
-             with a 100%-width child and can size unpredictably. */}
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="relative min-w-0">
+            <div className="relative w-full sm:w-80">
               <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search by event or order ID"
-                className="pl-9 sm:w-80"
+                className="pl-9 w-full"
                 aria-label="Search orders"
               />
             </div>
@@ -97,8 +93,45 @@ export function OrdersPage() {
           </div>
 
           {filtered.length ? (
-            <div className="overflow-hidden rounded-2xl border border-border bg-card">
-              <div className="overflow-x-auto">
+            <>
+              {/* Mobile Card Layout (No horizontal scrolling) */}
+              <div className="space-y-4 md:hidden">
+                {filtered.map((o) => (
+                  <div key={o.id} className="rounded-2xl border border-border bg-card p-4 space-y-3">
+                    <div className="flex items-center justify-between border-b border-border pb-3">
+                      <div>
+                        <p className="font-mono text-xs text-muted-foreground">Order #{o.id}</p>
+                        <p className="text-xs text-muted-foreground">{formatDate(o.createdAt)}</p>
+                      </div>
+                      <span className="font-semibold text-primary">{formatCurrency(o.amount)}</span>
+                    </div>
+
+                    <div>
+                      <h4 className="font-medium text-base truncate">{o.event?.title ?? "Event"}</h4>
+                      <p className="text-xs text-muted-foreground mt-0.5">Quantity: {o.quantity}</p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                      <div className="flex gap-2">
+                        <OrderStatusBadge status={o.status} />
+                        <PaymentStatusBadge status={o.paymentStatus} />
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 gap-1.5 text-xs"
+                        onClick={() => toast.success(`Receipt for ${o.id} downloaded`)}
+                      >
+                        <Receipt className="size-3.5" />
+                        Receipt
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop Table Layout */}
+              <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-card">
                 <Table>
                   <TableHeader>
                     <TableRow className="hover:bg-transparent">
@@ -144,7 +177,7 @@ export function OrdersPage() {
                   </TableBody>
                 </Table>
               </div>
-            </div>
+            </>
           ) : (
             <EmptyState
               icon={Receipt}
