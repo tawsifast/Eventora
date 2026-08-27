@@ -36,59 +36,107 @@ export function AdminUsersTable({ users, currentUserId }: { users: User[]; curre
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-border bg-card">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead>Name</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Joined</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {users.map((u) => (
-              <TableRow key={u.id}>
-                <TableCell className="font-medium">{u.name}</TableCell>
-                <TableCell className="max-w-[200px] truncate text-muted-foreground">{u.email}</TableCell>
-                <TableCell>
-                  {u.id === currentUserId ? (
-                    <span className="flex items-center gap-2">
-                      <RoleBadge role={u.role} />
-                      <span className="text-xs text-muted-foreground">(you)</span>
-                    </span>
-                  ) : (
-                    <Select
-                      value={u.role}
-                      disabled={savingId !== null}
-                      onValueChange={(v) => handleRoleChange(u.id, v as UserRole)}
-                    >
-                      <SelectTrigger className="w-full max-w-[130px]" aria-label={`Role for ${u.name}`}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ROLES.map((r) => (
-                          <SelectItem key={r.value} value={r.value}>
-                            {r.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <UserStatusBadge status={u.status} />
-                </TableCell>
-                <TableCell className="whitespace-nowrap text-right text-muted-foreground">
-                  {formatDate(u.createdAt ?? u.joinedAt)}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+    <>
+      {/* Mobile Card Layout (No Horizontal Scroll) */}
+      <div className="grid gap-3 md:hidden">
+        {users.map((u) => (
+          <div key={u.id} className="rounded-2xl border border-border bg-card p-4 space-y-3">
+            <div className="flex items-start justify-between gap-2 border-b border-border pb-2.5">
+              <div className="min-w-0">
+                <p className="font-semibold text-base truncate">{u.name}</p>
+                <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+              </div>
+              <UserStatusBadge status={u.status} />
+            </div>
+
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs text-muted-foreground">Joined {formatDate(u.createdAt ?? u.joinedAt)}</span>
+
+              <div>
+                {u.id === currentUserId ? (
+                  <span className="flex items-center gap-1.5">
+                    <RoleBadge role={u.role} />
+                    <span className="text-xs text-muted-foreground">(you)</span>
+                  </span>
+                ) : (
+                  <Select
+                    value={u.role}
+                    disabled={savingId !== null}
+                    onValueChange={(v) => handleRoleChange(u.id, v as UserRole)}
+                  >
+                    <SelectTrigger className="h-8 w-[110px] text-xs" aria-label={`Role for ${u.name}`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ROLES.map((r) => (
+                        <SelectItem key={r.value} value={r.value} className="text-xs">
+                          {r.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
-    </div>
+
+      {/* Desktop Table Layout */}
+      <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-transparent">
+                <TableHead>Name</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Joined</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {users.map((u) => (
+                <TableRow key={u.id}>
+                  <TableCell className="font-medium">{u.name}</TableCell>
+                  <TableCell className="max-w-[200px] truncate text-muted-foreground">{u.email}</TableCell>
+                  <TableCell>
+                    {u.id === currentUserId ? (
+                      <span className="flex items-center gap-2">
+                        <RoleBadge role={u.role} />
+                        <span className="text-xs text-muted-foreground">(you)</span>
+                      </span>
+                    ) : (
+                      <Select
+                        value={u.role}
+                        disabled={savingId !== null}
+                        onValueChange={(v) => handleRoleChange(u.id, v as UserRole)}
+                      >
+                        <SelectTrigger className="w-full max-w-[130px]" aria-label={`Role for ${u.name}`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ROLES.map((r) => (
+                            <SelectItem key={r.value} value={r.value}>
+                              {r.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <UserStatusBadge status={u.status} />
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap text-right text-muted-foreground">
+                    {formatDate(u.createdAt ?? u.joinedAt)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+    </>
   );
 }

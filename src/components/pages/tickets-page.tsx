@@ -21,7 +21,7 @@ function QrMock({ id }: { id: string }) {
   return (
     <div
       aria-label={`QR code for ticket ${id}`}
-      className="grid size-24 shrink-0 grid-cols-7 gap-0.5 rounded-xl border border-border bg-background p-2"
+      className="grid size-20 shrink-0 grid-cols-7 gap-0.5 rounded-xl border border-border bg-background p-1.5 sm:size-24 sm:p-2"
     >
       {Array.from({ length: 49 }).map((_, i) => {
         const on = (id.charCodeAt(i % id.length) + i * 7) % 3 !== 0;
@@ -43,9 +43,9 @@ function TicketRow({ ticket, event }: { ticket: Ticket; event?: Event }) {
               {ticket.tierName} · {ticket.quantity} {ticket.quantity > 1 ? "seats" : "seat"}
             </span>
           </div>
-          <h3 className="text-2xl leading-tight">
+          <h3 className="text-xl font-bold leading-tight sm:text-2xl">
             {event ? (
-              <Link href={`/events/${event.slug}`} className="hover:text-primary">
+              <Link href={`/events/${event.slug}`} className="hover:text-primary transition-colors">
                 {event.title}
               </Link>
             ) : (
@@ -53,18 +53,15 @@ function TicketRow({ ticket, event }: { ticket: Ticket; event?: Event }) {
             )}
           </h3>
           {event ? (
-            <dl className="grid gap-1.5 text-sm text-muted-foreground">
+            <dl className="grid gap-1.5 text-xs sm:text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
-                <CalendarDays className="size-3.5 text-primary" />
-                <dd>
+                <CalendarDays className="size-3.5 text-primary shrink-0" />
+                <dd className="truncate">
                   {formatLongDate(event.date)} · {to12h(event.startTime)}
                 </dd>
               </div>
               <div className="flex min-w-0 items-center gap-2">
                 <MapPin className="size-3.5 shrink-0 text-primary" />
-                {/* min-w-0 needed here: truncate on a flex item next to an
-                   icon sibling is ignored without it, so long venue names
-                   would overflow the card instead of being clipped. */}
                 <dd className="min-w-0 truncate">
                   {event.venue}, {event.city}
                 </dd>
@@ -72,19 +69,19 @@ function TicketRow({ ticket, event }: { ticket: Ticket; event?: Event }) {
             </dl>
           ) : null}
           <Separator className="max-w-xs" />
-          <p className="font-mono text-xs text-muted-foreground">
+          <p className="font-mono text-[11px] sm:text-xs text-muted-foreground">
             {ticket.id.toUpperCase()} · purchased {formatDate(ticket.purchasedAt)}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-4 sm:flex-col sm:items-end">
+        <div className="flex items-center justify-between gap-4 border-t border-border pt-4 sm:border-0 sm:pt-0 sm:flex-col sm:items-end sm:justify-center">
           <QrMock id={ticket.id} />
-          <div className="flex flex-col gap-2">
-            <Button size="sm" variant="secondary" onClick={() => toast.success("Ticket PDF downloaded")}>
-              <Download className="size-4" /> Download
+          <div className="flex flex-col gap-2 w-full sm:w-auto">
+            <Button size="sm" variant="secondary" onClick={() => toast.success("Ticket PDF downloaded")} className="w-full sm:w-auto">
+              <Download className="size-4 mr-1.5 sm:mr-0" /> Download
             </Button>
-            <Button size="sm" variant="ghost" onClick={() => toast.success("Showing entry QR code")}>
-              <QrCode className="size-4" /> Show QR
+            <Button size="sm" variant="ghost" onClick={() => toast.success("Showing entry QR code")} className="w-full sm:w-auto">
+              <QrCode className="size-4 mr-1.5 sm:mr-0" /> Show QR
             </Button>
           </div>
         </div>
@@ -118,17 +115,17 @@ export function TicketsPage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-10 px-4 py-14 sm:px-6 lg:px-8">
-      <PageHeader
-        eyebrow="Ticket wallet"
-        title="My Tickets"
-        subtitle="Your digital passes, ready to scan at the gate."
-        action={
-          <Button asChild variant="outline">
-            <Link href="/events">Find more events</Link>
-          </Button>
-        }
-      />
+    <div className="mx-auto w-full max-w-5xl space-y-6 sm:space-y-10 px-4 py-8 sm:px-6 sm:py-14 lg:px-8 overflow-x-hidden">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <PageHeader
+          eyebrow="Ticket wallet"
+          title="My Tickets"
+          subtitle="Your digital passes, ready to scan at the gate."
+        />
+        <Button asChild variant="outline" className="w-full sm:w-auto shrink-0">
+          <Link href="/events">Find more events</Link>
+        </Button>
+      </div>
 
       {loading ? (
         <div className="space-y-3">
@@ -138,11 +135,8 @@ export function TicketsPage() {
         </div>
       ) : (
         <Tabs value={tab} onValueChange={setTab}>
-          {/* overflow-x-auto is a safety net: if the three tab triggers
-             ever don't fit a very narrow screen, they scroll horizontally
-             within this strip instead of breaking the page width. */}
-          <div className="overflow-x-auto">
-            <TabsList>
+          <div className="overflow-x-auto pb-1">
+            <TabsList className="w-full sm:w-auto justify-start">
               <TabsTrigger value="active">Upcoming ({groups.active.length})</TabsTrigger>
               <TabsTrigger value="used">Attended ({groups.used.length})</TabsTrigger>
               <TabsTrigger value="cancelled">Cancelled ({groups.cancelled.length})</TabsTrigger>
@@ -150,7 +144,7 @@ export function TicketsPage() {
           </div>
 
           {(["active", "used", "cancelled"] as const).map((key) => (
-            <TabsContent key={key} value={key} className="pt-8">
+            <TabsContent key={key} value={key} className="pt-6">
               {groups[key].length ? (
                 <div className="grid gap-5">
                   {groups[key].map((t) => (

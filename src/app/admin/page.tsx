@@ -55,23 +55,48 @@ export default async function AdminPage() {
 
   return (
     <DashboardShell label="Admin" items={navItems}>
-      <PageHeader
-        eyebrow="Platform"
-        title="Admin Overview"
-        subtitle="Events, organizers and ticket volume across EventHub."
-      />
+      <div className="space-y-8 overflow-x-hidden">
+        <PageHeader
+          eyebrow="Platform"
+          title="Admin Overview"
+          subtitle="Events, organizers and ticket volume across EventHub."
+        />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard icon={CalendarDays} label="Total events" value={String(stats.totalEvents)} hint="all statuses" />
-        <StatCard icon={Users} label="Organizers" value={String(stats.totalOrganizers)} hint={`${stats.totalUsers} users total`} />
-        <StatCard icon={Ticket} label="Tickets sold" value={formatNumber(stats.totalTicketsSold)} hint="lifetime" />
-        <StatCard icon={DollarSign} label="Collected revenue" value={formatCurrency(stats.totalRevenue)} hint="paid orders" />
-      </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard icon={CalendarDays} label="Total events" value={String(stats.totalEvents)} hint="all statuses" />
+          <StatCard icon={Users} label="Organizers" value={String(stats.totalOrganizers)} hint={`${stats.totalUsers} users total`} />
+          <StatCard icon={Ticket} label="Tickets sold" value={formatNumber(stats.totalTicketsSold)} hint="lifetime" />
+          <StatCard icon={DollarSign} label="Collected revenue" value={formatCurrency(stats.totalRevenue)} hint="paid orders" />
+        </div>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl">Event moderation</h2>
-        <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="overflow-x-auto">
+        {/* Event Moderation Section */}
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold sm:text-2xl">Event moderation</h2>
+
+          {/* Mobile Card View */}
+          <div className="grid gap-3 md:hidden">
+            {allEvents.slice(0, 8).map((e) => (
+              <div key={e.id} className="rounded-2xl border border-border bg-card p-4 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <Link href={`/events/${e.slug}`} className="font-medium text-base hover:text-primary line-clamp-1">
+                    {e.title}
+                  </Link>
+                  <EventStatusBadge status={e.status} />
+                </div>
+                <div className="flex items-center justify-between text-xs text-muted-foreground pt-1 border-t border-border">
+                  <span>{e.organizer?.name ?? "Organizer"}</span>
+                  <span>{formatDate(e.date)}</span>
+                </div>
+                <div className="flex justify-between items-center text-xs font-mono pt-1">
+                  <span className="text-muted-foreground">Tickets Sold:</span>
+                  <span className="font-semibold">{formatNumber(e.ticketsSold)} / {formatNumber(e.capacity)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-card">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
@@ -103,13 +128,33 @@ export default async function AdminPage() {
               </TableBody>
             </Table>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl">Recent orders</h2>
-        <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="overflow-x-auto">
+        {/* Recent Orders Section */}
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold sm:text-2xl">Recent orders</h2>
+
+          {/* Mobile Card View */}
+          <div className="grid gap-3 md:hidden">
+            {allOrders.slice(0, 8).map((o) => (
+              <div key={o.id} className="rounded-2xl border border-border bg-card p-4 space-y-2.5">
+                <div className="flex items-center justify-between border-b border-border pb-2">
+                  <span className="font-mono text-xs text-muted-foreground">Order #{o.id}</span>
+                  <span className="font-semibold text-primary">{formatCurrency(o.amount)}</span>
+                </div>
+                <div className="space-y-1">
+                  <p className="font-medium text-sm truncate">{o.event?.title ?? "Event"}</p>
+                  <p className="text-xs text-muted-foreground">Customer: {o.customerName}</p>
+                </div>
+                <div className="pt-1">
+                  <OrderStatusBadge status={o.status} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-hidden rounded-2xl border border-border bg-card">
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
@@ -137,13 +182,16 @@ export default async function AdminPage() {
               </TableBody>
             </Table>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl">Users</h2>
-        <AdminUsersTable users={allUsers} currentUserId={currentUser.id} />
-      </section>
+        {/* Users Section */}
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold sm:text-2xl">Users</h2>
+          <div className="overflow-x-auto">
+            <AdminUsersTable users={allUsers} currentUserId={currentUser.id} />
+          </div>
+        </section>
+      </div>
     </DashboardShell>
   );
 }
