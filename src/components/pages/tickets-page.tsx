@@ -35,7 +35,7 @@ function TicketRow({ ticket, event }: { ticket: Ticket; event?: Event }) {
   return (
     <article className="relative overflow-hidden rounded-2xl border border-border bg-card">
       <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-primary to-primary/20" />
-      <div className="grid gap-5 p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-6">
+      <div className="grid gap-5 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:p-6">
         <div className="min-w-0 space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <TicketStatusBadge status={ticket.status} />
@@ -60,9 +60,12 @@ function TicketRow({ ticket, event }: { ticket: Ticket; event?: Event }) {
                   {formatLongDate(event.date)} · {to12h(event.startTime)}
                 </dd>
               </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="size-3.5 text-primary" />
-                <dd className="truncate">
+              <div className="flex min-w-0 items-center gap-2">
+                <MapPin className="size-3.5 shrink-0 text-primary" />
+                {/* min-w-0 needed here: truncate on a flex item next to an
+                   icon sibling is ignored without it, so long venue names
+                   would overflow the card instead of being clipped. */}
+                <dd className="min-w-0 truncate">
                   {event.venue}, {event.city}
                 </dd>
               </div>
@@ -74,7 +77,7 @@ function TicketRow({ ticket, event }: { ticket: Ticket; event?: Event }) {
           </p>
         </div>
 
-        <div className="flex items-center gap-4 sm:flex-col sm:items-end">
+        <div className="flex flex-wrap items-center gap-4 sm:flex-col sm:items-end">
           <QrMock id={ticket.id} />
           <div className="flex flex-col gap-2">
             <Button size="sm" variant="secondary" onClick={() => toast.success("Ticket PDF downloaded")}>
@@ -129,17 +132,22 @@ export function TicketsPage() {
 
       {loading ? (
         <div className="space-y-3">
-          <Skeleton className="h-12 w-72" />
+          <Skeleton className="h-12 w-full max-w-72" />
           <Skeleton className="h-40 w-full" />
           <Skeleton className="h-40 w-full" />
         </div>
       ) : (
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList>
-            <TabsTrigger value="active">Upcoming ({groups.active.length})</TabsTrigger>
-            <TabsTrigger value="used">Attended ({groups.used.length})</TabsTrigger>
-            <TabsTrigger value="cancelled">Cancelled ({groups.cancelled.length})</TabsTrigger>
-          </TabsList>
+          {/* overflow-x-auto is a safety net: if the three tab triggers
+             ever don't fit a very narrow screen, they scroll horizontally
+             within this strip instead of breaking the page width. */}
+          <div className="overflow-x-auto">
+            <TabsList>
+              <TabsTrigger value="active">Upcoming ({groups.active.length})</TabsTrigger>
+              <TabsTrigger value="used">Attended ({groups.used.length})</TabsTrigger>
+              <TabsTrigger value="cancelled">Cancelled ({groups.cancelled.length})</TabsTrigger>
+            </TabsList>
+          </div>
 
           {(["active", "used", "cancelled"] as const).map((key) => (
             <TabsContent key={key} value={key} className="pt-8">

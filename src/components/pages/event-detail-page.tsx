@@ -109,14 +109,15 @@ export function EventDetailPage({
   }
 
   return (
-    <div>
+    <div className="w-full overflow-x-hidden">
       <section className="relative isolate">
         <div className="absolute inset-0 -z-10 overflow-hidden">
           <EventImage event={event} sizes="100vw" priority className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/85 to-background/45" />
         </div>
-        <div className="mx-auto w-full max-w-7xl px-4 pb-12 pt-16 sm:px-6 sm:pt-24 lg:px-8">
-          <Button asChild variant="ghost" size="sm" className="mb-6 -ml-2 text-muted-foreground">
+
+        <div className="mx-auto w-full max-w-7xl px-4 pb-8 pt-24 sm:px-6 sm:pb-12 sm:pt-36 lg:px-8">
+          <Button asChild variant="ghost" size="sm" className="mb-4 -ml-2 text-muted-foreground">
             <Link href="/events">
               <ArrowLeft className="size-4" /> All events
             </Link>
@@ -130,94 +131,98 @@ export function EventDetailPage({
               </span>
             ) : null}
           </div>
-          <h1 className="mt-5 max-w-3xl text-4xl leading-[1.03] sm:text-6xl">{event.title}</h1>
-          <p className="mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">{event.shortDescription}</p>
-          <div className="mt-6 flex flex-wrap gap-x-7 gap-y-3 text-sm text-muted-foreground">
+          <h1 className="mt-4 max-w-3xl text-2xl font-bold leading-tight break-words sm:text-4xl lg:text-6xl">
+            {event.title}
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm text-muted-foreground sm:text-lg">{event.shortDescription}</p>
+          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-xs sm:text-sm text-muted-foreground">
             <span className="flex items-center gap-2">
-              <CalendarDays className="size-4 text-primary" /> {formatLongDate(event.date)}
+              <CalendarDays className="size-4 shrink-0 text-primary" /> {formatLongDate(event.date)}
             </span>
             <span className="flex items-center gap-2">
-              <Clock className="size-4 text-primary" /> {formatTimeRange(event.startTime, event.endTime)}
+              <Clock className="size-4 shrink-0 text-primary" /> {formatTimeRange(event.startTime, event.endTime)}
             </span>
             <span className="flex items-center gap-2">
-              <MapPin className="size-4 text-primary" /> {event.venue}, {event.city}
+              <MapPin className="size-4 shrink-0 text-primary" /> {event.venue}, {event.city}
             </span>
             <span className="flex items-center gap-2">
-              <User2 className="size-4 text-primary" /> {event.organizer?.name ?? "Organizer"}
+              <User2 className="size-4 shrink-0 text-primary" /> {event.organizer?.name ?? "Organizer"}
             </span>
             <span className="flex items-center gap-2">
-              <Star className="size-4 fill-primary text-primary" /> {event.rating.toFixed(1)} ({event.reviewCount}{" "}
+              <Star className="size-4 shrink-0 fill-primary text-primary" /> {event.rating.toFixed(1)} ({event.reviewCount}{" "}
               reviews)
             </span>
           </div>
         </div>
       </section>
 
-      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 pb-20 sm:px-6 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] lg:px-8">
+      <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 pb-16 sm:px-6 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] lg:gap-10 lg:px-8 lg:pb-20">
         {/* Main column */}
-        <div className="min-w-0">
-          <Tabs defaultValue="about">
-            <TabsList className="w-full justify-start overflow-x-auto">
-              <TabsTrigger value="about">About</TabsTrigger>
-              <TabsTrigger value="schedule">Schedule</TabsTrigger>
-              <TabsTrigger value="venue">Venue</TabsTrigger>
-              <TabsTrigger value="reviews">Reviews</TabsTrigger>
-            </TabsList>
+        <div className="min-w-0 w-full">
+          <Tabs defaultValue="about" className="w-full">
+            <div className="w-full overflow-x-auto no-scrollbar">
+              <TabsList className="inline-flex w-full min-w-max justify-start gap-1 p-1">
+                <TabsTrigger value="about" className="text-xs sm:text-sm px-3 py-1.5">About</TabsTrigger>
+                <TabsTrigger value="schedule" className="text-xs sm:text-sm px-3 py-1.5">Schedule</TabsTrigger>
+                <TabsTrigger value="venue" className="text-xs sm:text-sm px-3 py-1.5">Venue</TabsTrigger>
+                <TabsTrigger value="reviews" className="text-xs sm:text-sm px-3 py-1.5">Reviews</TabsTrigger>
+              </TabsList>
+            </div>
 
-            <TabsContent value="about" className="space-y-8 pt-8">
-              <p className="text-base leading-relaxed text-muted-foreground">{event.description}</p>
-              <div className="grid gap-4 sm:grid-cols-3">
+            <TabsContent value="about" className="space-y-6 pt-6 sm:space-y-8 sm:pt-8">
+              <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">{event.description}</p>
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-3">
                 {[
                   { label: "Capacity", value: formatNumber(event.capacity) },
                   { label: "Tickets sold", value: formatNumber(event.ticketsSold) },
                   { label: "Seats left", value: formatNumber(seatsLeft) },
                 ].map((s) => (
-                  <div key={s.label} className="rounded-2xl border border-border bg-card p-5">
+                  <div key={s.label} className="rounded-2xl border border-border bg-card p-4 sm:p-5">
                     <p className="eyebrow">{s.label}</p>
-                    <p className="mt-2 font-display text-3xl">{s.value}</p>
+                    <p className="mt-1 font-display text-2xl sm:text-3xl">{s.value}</p>
                   </div>
                 ))}
               </div>
-              <div className="rounded-2xl border border-border bg-card p-6">
+              <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
                 <p className="eyebrow">Ticket tiers</p>
                 <div className="mt-4 grid gap-3">
                   {event.tiers.map((t: TicketTier) => (
-                    <div key={t.id} className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3 last:border-0 last:pb-0">
+                    <div key={t.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border pb-3 last:border-0 last:pb-0">
                       <div className="min-w-0">
-                        <p className="font-medium">{t.name}</p>
-                        <p className="text-sm text-muted-foreground">{t.perks}</p>
+                        <p className="font-medium text-sm sm:text-base">{t.name}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">{t.perks}</p>
                       </div>
-                      <p className="font-display text-xl text-primary">{formatCurrency(t.price)}</p>
+                      <p className="font-display text-lg sm:text-xl text-primary">{formatCurrency(t.price)}</p>
                     </div>
                   ))}
                 </div>
               </div>
             </TabsContent>
 
-            <TabsContent value="schedule" className="pt-8">
-              <ol className="relative space-y-6 border-l border-border pl-6">
+            <TabsContent value="schedule" className="pt-6 sm:pt-8">
+              <ol className="relative space-y-6 border-l border-border pl-6 sm:pl-8">
                 {event.schedule.map((item: ScheduleItem) => (
                   <li key={item.id} className="relative">
-                    <span className="absolute -left-[1.9rem] top-1.5 size-2.5 rounded-full bg-primary" />
+                    <span className="absolute -left-[1.85rem] sm:-left-[2.1rem] top-1.5 size-2.5 rounded-full bg-primary" />
                     <p className="font-mono text-xs tracking-wider text-primary">{item.time}</p>
-                    <p className="mt-1 text-lg leading-snug">{item.title}</p>
+                    <p className="mt-1 text-base sm:text-lg leading-snug">{item.title}</p>
                     {item.speaker ? (
-                      <p className="text-sm text-muted-foreground">with {item.speaker}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">with {item.speaker}</p>
                     ) : null}
                   </li>
                 ))}
               </ol>
             </TabsContent>
 
-            <TabsContent value="venue" className="space-y-4 pt-8">
-              <div className="rounded-2xl border border-border bg-card p-6">
+            <TabsContent value="venue" className="space-y-4 pt-6 sm:pt-8">
+              <div className="rounded-2xl border border-border bg-card p-4 sm:p-6">
                 <p className="eyebrow">Location</p>
-                <h3 className="mt-2 text-2xl">{event.venue}</h3>
-                <p className="mt-1 text-muted-foreground">
+                <h3 className="mt-2 text-xl sm:text-2xl">{event.venue}</h3>
+                <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                   {event.address}, {event.city}
                 </p>
-                <Separator className="my-5" />
-                <ul className="grid gap-2 text-sm text-muted-foreground sm:grid-cols-2">
+                <Separator className="my-4 sm:my-5" />
+                <ul className="grid gap-2 text-xs sm:text-sm text-muted-foreground sm:grid-cols-2">
                   {[
                     "Doors open one hour before start",
                     "Digital tickets scanned at the gate",
@@ -230,17 +235,17 @@ export function EventDetailPage({
                   ))}
                 </ul>
               </div>
-              <div className="flex h-48 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 text-sm text-muted-foreground">
+              <div className="flex h-40 sm:h-48 items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 text-xs sm:text-sm text-muted-foreground">
                 Map preview
               </div>
             </TabsContent>
 
-            <TabsContent value="reviews" className="space-y-5 pt-8">
-              <div className="flex flex-wrap items-center gap-5 rounded-2xl border border-border bg-card p-6">
-                <p className="font-display text-5xl text-primary">{event.rating.toFixed(1)}</p>
+            <TabsContent value="reviews" className="space-y-4 sm:space-y-5 pt-6 sm:pt-8">
+              <div className="flex flex-wrap items-center gap-4 sm:gap-5 rounded-2xl border border-border bg-card p-4 sm:p-6">
+                <p className="font-display text-3xl sm:text-5xl text-primary">{event.rating.toFixed(1)}</p>
                 <div>
                   <StarRating rating={event.rating} />
-                  <p className="mt-1 text-sm text-muted-foreground">
+                  <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                     Based on {event.reviewCount} attendee reviews
                   </p>
                 </div>
@@ -252,7 +257,7 @@ export function EventDetailPage({
                     e.preventDefault();
                     handleReview();
                   }}
-                  className="space-y-4 rounded-2xl border border-border bg-card p-6"
+                  className="space-y-4 rounded-2xl border border-border bg-card p-4 sm:p-6"
                 >
                   <div>
                     <p className="text-sm font-medium">Write a review</p>
@@ -289,7 +294,7 @@ export function EventDetailPage({
                   </div>
                 </form>
               ) : (
-                <p className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+                <p className="rounded-2xl border border-dashed border-border p-4 sm:p-6 text-center text-xs sm:text-sm text-muted-foreground">
                   <Link href="/login" className="font-medium text-primary hover:underline">
                     Log in
                   </Link>{" "}
@@ -298,29 +303,29 @@ export function EventDetailPage({
               )}
 
               {reviews.length ? (
-                <div className="grid gap-4">
+                <div className="grid gap-3 sm:gap-4">
                   {reviews.map((r) => (
-                    <article key={r.id} className="rounded-2xl border border-border bg-card p-5">
+                    <article key={r.id} className="rounded-2xl border border-border bg-card p-4 sm:p-5">
                       <div className="flex items-center gap-3">
-                        <Avatar className="size-9 border border-border">
+                        <Avatar className="size-8 sm:size-9 border border-border">
                           <AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
                             {initialsFromName(r.user?.name ?? "Attendee")}
                           </AvatarFallback>
                         </Avatar>
                         <div className="min-w-0">
-                          <p className="truncate font-medium">{r.user?.name ?? "Attendee"}</p>
-                          <p className="text-xs text-muted-foreground">{formatRelative(r.createdAt)}</p>
+                          <p className="truncate text-xs sm:text-sm font-medium">{r.user?.name ?? "Attendee"}</p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground">{formatRelative(r.createdAt)}</p>
                         </div>
                         <div className="ml-auto shrink-0">
                           <StarRating rating={r.rating} size={12} />
                         </div>
                       </div>
-                      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{r.comment}</p>
+                      <p className="mt-3 text-xs sm:text-sm leading-relaxed text-muted-foreground break-words">{r.comment}</p>
                     </article>
                   ))}
                 </div>
               ) : (
-                <p className="rounded-2xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+                <p className="rounded-2xl border border-dashed border-border p-6 sm:p-8 text-center text-xs sm:text-sm text-muted-foreground">
                   No reviews yet — be the first to review after attending.
                 </p>
               )}
@@ -329,102 +334,105 @@ export function EventDetailPage({
         </div>
 
         {/* Booking rail */}
-        <aside className="lg:sticky lg:top-24 lg:h-fit">
-          <div className="space-y-5 rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-glow)]">
-            <div>
-              <p className="eyebrow">Starting from</p>
-              <p className="mt-1 font-display text-4xl text-primary">{formatCurrency(event.price)}</p>
-            </div>
+       {/* Booking rail */}
+<aside className="w-full min-w-0 lg:sticky lg:top-24 lg:h-fit">
+  <div className="space-y-4 sm:space-y-5 rounded-3xl border border-border bg-card p-4 sm:p-6 shadow-glow overflow-hidden">
+    <div>
+      <p className="eyebrow">Starting from</p>
+      <p className="mt-1 font-display text-2xl sm:text-4xl text-primary">{formatCurrency(event.price)}</p>
+    </div>
 
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Choose a tier</p>
-              {event.tiers.map((t: TicketTier) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  onClick={() => setTierId(t.id)}
-                  className={`flex w-full items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-[color,background-color,border-color,box-shadow] duration-300 ${
-                    t.id === tier?.id
-                      ? "border-primary bg-primary/10 shadow-[0_0_24px_-8px_color-mix(in_oklab,var(--primary)_60%,transparent)]"
-                      : "border-border hover:border-primary/40 hover:bg-accent"
-                  }`}
-                >
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-medium">{t.name}</span>
-                    <span className="block truncate text-xs text-muted-foreground">{t.perks}</span>
-                  </span>
-                  <span className="shrink-0 font-display text-lg">{formatCurrency(t.price)}</span>
-                </button>
-              ))}
-            </div>
-
-            <div className="flex items-center justify-between gap-3">
-              <span className="text-sm font-medium">Quantity</span>
-              <div className="flex items-center gap-1 rounded-xl border border-border p-1">
-                <Button variant="ghost" size="icon" className="size-8" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease quantity">
-                  −
-                </Button>
-                <span className="w-8 text-center text-sm font-semibold">{qty}</span>
-                <Button variant="ghost" size="icon" className="size-8" onClick={() => setQty((q) => Math.min(10, q + 1))} aria-label="Increase quantity">
-                  +
-                </Button>
-              </div>
-            </div>
-
-            <Separator />
-
-            <dl className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Subtotal</dt>
-                <dd>{formatCurrency(subtotal)}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="text-muted-foreground">Service fee</dt>
-                <dd>{formatCurrency(fee)}</dd>
-              </div>
-              <div className="flex justify-between border-t border-border pt-2 text-base">
-                <dt className="font-medium">Total</dt>
-                <dd className="font-display text-2xl text-primary">{formatCurrency(subtotal + fee)}</dd>
-              </div>
-            </dl>
-
-            <Button
-              className="w-full"
-              size="lg"
-              disabled={seatsLeft === 0 || booking}
-              onClick={handleBooking}
-            >
-              <Ticket className="size-4" /> {booking ? "Placing order..." : seatsLeft === 0 ? "Sold out" : "Get tickets"}
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => toast.success("Event link copied to clipboard")}
-            >
-              <Share2 className="size-4" /> Share event
-            </Button>
-
-            <div className="space-y-2 rounded-xl bg-muted/40 p-4">
-              <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <Users className="size-3.5" /> {formatNumber(event.ticketsSold)} going
-                </span>
-                <span>{soldPct}% sold</span>
-              </div>
-              <Progress value={soldPct} className="h-1.5" />
-            </div>
+    <div className="space-y-2">
+      <p className="text-sm font-medium">Choose a tier</p>
+      {event.tiers.map((t: TicketTier) => (
+        <button
+          key={t.id}
+          type="button"
+          onClick={() => setTierId(t.id)}
+          className={`flex w-full items-center justify-between gap-2 rounded-xl border p-3 text-left transition-all duration-300 ${
+            t.id === tier?.id
+              ? "border-primary bg-primary/10 shadow-[0_0_24px_-8px_color-mix(in_oklab,var(--primary)_60%,transparent)]"
+              : "border-border hover:border-primary/40 hover:bg-accent"
+          }`}
+        >
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs sm:text-sm font-medium leading-tight">{t.name}</p>
+            <p className="truncate text-[10px] sm:text-xs text-muted-foreground mt-0.5">{t.perks}</p>
           </div>
-        </aside>
+          <span className="shrink-0 font-display text-sm sm:text-base font-semibold">{formatCurrency(t.price)}</span>
+        </button>
+      ))}
+    </div>
+
+    <div className="flex items-center justify-between gap-2">
+      <span className="text-xs sm:text-sm font-medium shrink-0">Quantity</span>
+      <div className="flex items-center gap-1 rounded-xl border border-border p-1 shrink-0">
+        <Button variant="ghost" size="icon" className="size-7 sm:size-8" onClick={() => setQty((q) => Math.max(1, q - 1))} aria-label="Decrease quantity">
+          −
+        </Button>
+        <span className="w-6 text-center text-xs sm:text-sm font-semibold">{qty}</span>
+        <Button variant="ghost" size="icon" className="size-7 sm:size-8" onClick={() => setQty((q) => Math.min(10, q + 1))} aria-label="Increase quantity">
+          +
+        </Button>
+      </div>
+    </div>
+
+    <Separator />
+
+    <dl className="space-y-2 text-xs sm:text-sm">
+      <div className="flex justify-between items-center">
+        <dt className="text-muted-foreground">Subtotal</dt>
+        <dd className="font-medium">{formatCurrency(subtotal)}</dd>
+      </div>
+      <div className="flex justify-between items-center">
+        <dt className="text-muted-foreground">Service fee</dt>
+        <dd className="font-medium">{formatCurrency(fee)}</dd>
+      </div>
+      <div className="flex justify-between items-center border-t border-border pt-2 text-sm sm:text-base">
+        <dt className="font-medium">Total</dt>
+        <dd className="font-display text-lg sm:text-2xl font-bold text-primary">{formatCurrency(subtotal + fee)}</dd>
+      </div>
+    </dl>
+
+    <div className="space-y-2">
+      <Button
+        className="w-full"
+        size="lg"
+        disabled={seatsLeft === 0 || booking}
+        onClick={handleBooking}
+      >
+        <Ticket className="size-4 mr-1" /> {booking ? "Placing order..." : seatsLeft === 0 ? "Sold out" : "Get tickets"}
+      </Button>
+      <Button
+        variant="outline"
+        className="w-full"
+        onClick={() => toast.success("Event link copied to clipboard")}
+      >
+        <Share2 className="size-4 mr-1" /> Share event
+      </Button>
+    </div>
+
+    <div className="space-y-2 rounded-xl bg-muted/40 p-3">
+      <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <Users className="size-3.5" /> {formatNumber(event.ticketsSold)} going
+        </span>
+        <span>{soldPct}% sold</span>
+      </div>
+      <Progress value={soldPct} className="h-1.5" />
+    </div>
+  </div>
+</aside>
       </div>
 
       {related.length ? (
         <section className="border-t border-border">
-          <div className="mx-auto w-full max-w-7xl space-y-8 px-4 py-16 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-7xl space-y-6 sm:space-y-8 px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
             <div className="space-y-2">
               <p className="eyebrow">You may also like</p>
-              <h2 className="text-3xl sm:text-4xl">More experiences</h2>
+              <h2 className="text-2xl sm:text-4xl">More experiences</h2>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((e) => (
                 <EventCard key={e.id} event={e} />
               ))}

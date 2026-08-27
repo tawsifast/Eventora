@@ -44,7 +44,7 @@ export function EventCard({ event, className }: { event: Event; className?: stri
 
       <div className="flex flex-1 flex-col gap-4 p-5">
         <div className="space-y-2">
-          <h3 className="text-2xl leading-tight">
+          <h3 className="line-clamp-2 text-2xl leading-tight">
             <Link
               href={`/events/${event.slug}`}
               className="transition-colors hover:text-primary"
@@ -56,9 +56,13 @@ export function EventCard({ event, className }: { event: Event; className?: stri
         </div>
 
         <dl className="grid gap-2 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 items-center gap-2">
             <MapPin className="size-3.5 shrink-0 text-primary" />
-            <dd className="truncate">
+            {/* min-w-0 is required on the truncating element itself when its
+               sibling is a flex item (the icon) — without it, text-overflow:
+               ellipsis is ignored and long venue names push past the card
+               edge instead of being clipped. */}
+            <dd className="min-w-0 truncate">
               {event.venue}, {event.city}
             </dd>
           </div>
@@ -92,10 +96,13 @@ export function EventCard({ event, className }: { event: Event; className?: stri
 
 export function CompactEventCard({ event }: { event: Event }) {
   return (
-    <article className="group flex gap-4 rounded-2xl border border-border bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-elevated)]">
+    // overflow-hidden added as a safety net: even if some inner content
+    // miscalculates its width, it gets clipped here instead of breaking
+    // the grid/page width on mobile.
+    <article className="group flex gap-4 overflow-hidden rounded-2xl border border-border bg-card p-4 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-[var(--shadow-elevated)]">
       <Link
         href={`/events/${event.slug}`}
-        className="relative size-24 shrink-0 overflow-hidden rounded-xl sm:size-28"
+        className="relative size-20 shrink-0 overflow-hidden rounded-xl sm:size-28"
       >
         <EventImage
           event={event}
@@ -104,7 +111,7 @@ export function CompactEventCard({ event }: { event: Event }) {
         />
       </Link>
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
+        <p className="truncate text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
           {formatDate(event.date)} · {getCategoryName(event.category?.slug ?? "general")}
         </p>
         <h3 className="truncate text-xl leading-tight">
@@ -112,12 +119,16 @@ export function CompactEventCard({ event }: { event: Event }) {
             {event.title}
           </Link>
         </h3>
-        <p className="flex items-center gap-1.5 truncate text-sm text-muted-foreground">
-          <MapPin className="size-3.5" />
-          {event.venue}, {event.city}
+        {/* Same fix as EventCard: truncate goes on a dedicated min-w-0 span,
+           not directly on the flex row that also contains the icon. */}
+        <p className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
+          <MapPin className="size-3.5 shrink-0" />
+          <span className="min-w-0 truncate">
+            {event.venue}, {event.city}
+          </span>
         </p>
-        <div className="mt-auto flex items-center justify-between gap-2">
-          <span className="font-display text-xl text-primary">
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-2">
+          <span className="font-display text-lg text-primary sm:text-xl">
             {event.price === 0 ? "Free" : formatCurrency(event.price)}
           </span>
           <Button asChild variant="ghost" size="sm">

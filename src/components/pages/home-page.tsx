@@ -36,12 +36,12 @@ export function HomePage({ featured, upcoming, categories }: HomePageProps) {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/40" />
-        <div className="relative mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+        <div className="relative mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
           <div className="max-w-3xl space-y-7">
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-card/80 px-3 py-1 text-xs font-medium uppercase tracking-widest backdrop-blur">
               <Sparkles className="size-3.5 text-primary" /> Discover. Experience. Remember.
             </span>
-            <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+            <h1 className="text-3xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
               Discover Events Worth Remembering
             </h1>
             <p className="max-w-2xl text-lg text-muted-foreground">
@@ -65,25 +65,28 @@ export function HomePage({ featured, upcoming, categories }: HomePageProps) {
                   aria-label="Search events"
                 />
               </div>
-              <Button type="submit" size="lg" className="h-11">
+              {/* Full width on mobile so the tap target matches the input above it */}
+              <Button type="submit" size="lg" className="h-11 w-full sm:w-auto">
                 Search
               </Button>
             </form>
 
-            <div className="flex flex-wrap gap-3">
-              <Button asChild size="lg">
+            {/* Stack full-width on mobile, side-by-side from sm up, to avoid two
+               multi-word buttons squeezing into a narrow row on small phones. */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <Button asChild size="lg" className="w-full sm:w-auto">
                 <Link href="/events">
                   Explore Events <ArrowRight className="size-4" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="bg-card/70 backdrop-blur">
+              <Button asChild size="lg" variant="outline" className="w-full bg-card/70 backdrop-blur sm:w-auto">
                 <Link href="/organizer/events/new">
                   <CalendarPlus className="size-4" /> Create an Event
                 </Link>
               </Button>
             </div>
 
-            <dl className="flex flex-wrap gap-x-10 gap-y-4 pt-4">
+            <dl className="flex flex-wrap gap-x-6 gap-y-4 pt-4 sm:gap-x-10">
               {[
                 { icon: Ticket, value: "268", label: "Live events" },
                 { icon: Users, value: "94k", label: "Tickets sold" },
@@ -153,7 +156,7 @@ export function HomePage({ featured, upcoming, categories }: HomePageProps) {
               dashboard.
             </p>
           </div>
-          <Button asChild size="lg">
+          <Button asChild size="lg" className="w-full md:w-auto">
             <Link href="/organizer/events/new">
               <CalendarPlus className="size-4" /> Create an Event
             </Link>

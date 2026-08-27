@@ -70,7 +70,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="mx-auto w-full max-w-md space-y-6 px-4 py-20">
+    <div className="mx-auto w-full max-w-md space-y-6 px-4 py-12 sm:py-20">
       <div className="space-y-2 text-center">
         <h1 className="text-3xl font-semibold tracking-tight">Create your account</h1>
         <p className="text-sm text-muted-foreground">Discover. Experience. Remember.</p>

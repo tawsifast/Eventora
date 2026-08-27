@@ -24,7 +24,7 @@ export default function AboutPage() {
   return (
     <div className="mx-auto w-full max-w-5xl space-y-12 px-4 py-12 sm:px-6 lg:px-8">
       <PageHeader title="About EventHub" subtitle="Discover. Experience. Remember." />
-      <div className="space-y-5 text-lg leading-relaxed text-muted-foreground">
+      <div className="space-y-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
         <p>
           EventHub began as a spreadsheet passed between three friends who kept missing gigs they would have loved.
           Today it is a marketplace where audiences find concerts, conferences, workshops, festivals and matches —

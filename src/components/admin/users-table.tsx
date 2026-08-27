@@ -65,7 +65,7 @@ export function AdminUsersTable({ users, currentUserId }: { users: User[]; curre
                       disabled={savingId !== null}
                       onValueChange={(v) => handleRoleChange(u.id, v as UserRole)}
                     >
-                      <SelectTrigger className="w-[130px]" aria-label={`Role for ${u.name}`}>
+                      <SelectTrigger className="w-full max-w-[130px]" aria-label={`Role for ${u.name}`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>

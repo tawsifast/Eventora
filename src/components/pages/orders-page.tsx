@@ -49,7 +49,7 @@ export function OrdersPage() {
   const totalSpent = all.reduce((sum, o) => (String(o.paymentStatus).toLowerCase() === "paid" ? sum + o.amount : sum), 0);
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-10 px-4 py-14 sm:px-6 lg:px-8">
+    <div className="mx-auto w-full max-w-6xl space-y-10 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
       <PageHeader
         eyebrow="Purchase history"
         title="Your Orders"
@@ -68,97 +68,101 @@ export function OrdersPage() {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-3 sm:flex sm:items-center">
-        <div className="relative min-w-0">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by event or order ID"
-            className="pl-9 sm:w-80"
-            aria-label="Search orders"
-          />
-        </div>
-        <Select value={status} onValueChange={setStatus}>
-          <SelectTrigger className="w-[150px]" aria-label="Filter by status">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
-            <SelectItem value="confirmed">Confirmed</SelectItem>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="cancelled">Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {filtered.length ? (
-        <div className="overflow-hidden rounded-2xl border border-border bg-card">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead>Order</TableHead>
-                  <TableHead>Event</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead className="text-center">Qty</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Payment</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                  <TableHead className="text-right">Receipt</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filtered.map((o) => (
-                  <TableRow key={o.id}>
-                    <TableCell className="font-mono text-xs">{o.id}</TableCell>
-                    <TableCell className="max-w-[220px] truncate font-medium">{o.event?.title ?? "Event"}</TableCell>
-                    <TableCell className="whitespace-nowrap text-muted-foreground">
-                      {formatDate(o.createdAt)}
-                    </TableCell>
-                    <TableCell className="text-center">{o.quantity}</TableCell>
-                    <TableCell>
-                      <OrderStatusBadge status={o.status} />
-                    </TableCell>
-                    <TableCell>
-                      <PaymentStatusBadge status={o.paymentStatus} />
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap text-right font-semibold text-primary">
-                      {formatCurrency(o.amount)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toast.success(`Receipt for ${o.id} downloaded`)}
-                      >
-                        <Receipt className="size-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          {/* flex-col on mobile stacks the search input and status filter
+             full-width, one per row — avoids the earlier grid-cols-[1fr_auto]
+             + child w-full combination, which mixes an auto-sized grid track
+             with a 100%-width child and can size unpredictably. */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="relative min-w-0">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by event or order ID"
+                className="pl-9 sm:w-80"
+                aria-label="Search orders"
+              />
+            </div>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger className="w-full sm:w-[150px]" aria-label="Filter by status">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="confirmed">Confirmed</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        </div>
-      ) : (
-        <EmptyState
-          icon={Receipt}
-          title="No orders found"
-          description="Try a different search or clear your filters."
-          action={
-            <Button
-              variant="outline"
-              onClick={() => {
-                setQuery("");
-                setStatus("all");
-              }}
-            >
-              Clear filters
-            </Button>
-          }
-        />
-      )}
+
+          {filtered.length ? (
+            <div className="overflow-hidden rounded-2xl border border-border bg-card">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <TableHead>Order</TableHead>
+                      <TableHead>Event</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead className="text-center">Qty</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Payment</TableHead>
+                      <TableHead className="text-right">Amount</TableHead>
+                      <TableHead className="text-right">Receipt</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filtered.map((o) => (
+                      <TableRow key={o.id}>
+                        <TableCell className="font-mono text-xs">{o.id}</TableCell>
+                        <TableCell className="max-w-[220px] truncate font-medium">{o.event?.title ?? "Event"}</TableCell>
+                        <TableCell className="whitespace-nowrap text-muted-foreground">
+                          {formatDate(o.createdAt)}
+                        </TableCell>
+                        <TableCell className="text-center">{o.quantity}</TableCell>
+                        <TableCell>
+                          <OrderStatusBadge status={o.status} />
+                        </TableCell>
+                        <TableCell>
+                          <PaymentStatusBadge status={o.paymentStatus} />
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-right font-semibold text-primary">
+                          {formatCurrency(o.amount)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toast.success(`Receipt for ${o.id} downloaded`)}
+                          >
+                            <Receipt className="size-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          ) : (
+            <EmptyState
+              icon={Receipt}
+              title="No orders found"
+              description="Try a different search or clear your filters."
+              action={
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setQuery("");
+                    setStatus("all");
+                  }}
+                >
+                  Clear filters
+                </Button>
+              }
+            />
+          )}
         </>
       )}
     </div>

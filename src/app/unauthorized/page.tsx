@@ -16,7 +16,7 @@ export default function UnauthorizedPage() {
         <ShieldAlert className="size-8" />
       </div>
       <p className="eyebrow mt-8">403 · Unauthorized</p>
-      <h1 className="mt-2 text-4xl font-semibold tracking-tight">Access denied</h1>
+      <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Access denied</h1>
       <p className="mt-3 max-w-md text-sm text-muted-foreground">
         Your account doesn&apos;t have permission to view this page. Sign in with a different account or
         head back to the EventHub home page.

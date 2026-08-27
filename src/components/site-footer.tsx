@@ -13,7 +13,7 @@ export async function SiteFooter() {
   }
   return (
     <footer className="mt-24 border-t border-border bg-card">
-      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-4 lg:px-8">
+      <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:grid-cols-2 md:grid-cols-4 lg:px-8">
         <div className="space-y-3">
           <EventHubLogo />
           <p className="max-w-xs text-sm text-muted-foreground">

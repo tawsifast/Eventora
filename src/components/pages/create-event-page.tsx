@@ -122,7 +122,7 @@ export function CreateEventPage() {
     <DashboardShell label="Organizer" items={navItems}>
       <div className="mx-auto max-w-2xl space-y-8">
         <PageHeader title="Create an Event" subtitle="Basics now, details later — you can edit anytime." />
-        <form className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-card)]" onSubmit={handleSubmit}>
+        <form className="space-y-5 rounded-2xl border border-border bg-card p-4 shadow-[var(--shadow-card)] sm:p-6" onSubmit={handleSubmit}>
           <div className="space-y-2">
             <Label htmlFor="title">Event title</Label>
             <Input id="title" name="title" placeholder="Nightfall Rooftop Sessions" required />
@@ -215,7 +215,7 @@ export function CreateEventPage() {
               </Button>
             </div>
             {tiers.map((tier, i) => (
-              <div key={i} className="grid grid-cols-[minmax(0,1fr)_100px_auto] items-end gap-3 rounded-xl border border-border bg-background/50 p-3">
+              <div key={i} className="grid grid-cols-1 items-end gap-3 rounded-xl border border-border bg-background/50 p-3 sm:grid-cols-[minmax(0,1fr)_100px_auto]">
                 <div className="space-y-1">
                   <Label className="text-xs" htmlFor={`tier-name-${i}`}>Name</Label>
                   <Input
@@ -273,7 +273,7 @@ export function CreateEventPage() {
             </div>
             {schedule.length ? (
               schedule.map((item, i) => (
-                <div key={i} className="grid grid-cols-[110px_minmax(0,1fr)_minmax(0,1fr)_auto] items-end gap-3 rounded-xl border border-border bg-background/50 p-3">
+                <div key={i} className="grid grid-cols-1 items-end gap-3 rounded-xl border border-border bg-background/50 p-3 sm:grid-cols-[110px_minmax(0,1fr)_minmax(0,1fr)_auto]">
                   <div className="space-y-1">
                     <Label className="text-xs" htmlFor={`sched-time-${i}`}>Time</Label>
                     <Input

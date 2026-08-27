@@ -90,7 +90,7 @@ export function DashboardShell({
                   <Menu className="size-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-72 p-0">
+              <SheetContent side="left" className="w-[85vw] max-w-72 p-0">
                 <SheetHeader className="border-b border-border p-4">
                   <SheetTitle asChild>
                     <EventHubLogo />

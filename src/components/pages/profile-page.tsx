@@ -89,9 +89,13 @@ export function ProfilePage() {
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0">
-              <h2 className="truncate text-3xl leading-tight">{profile.name}</h2>
-              <p className="flex items-center gap-1.5 truncate text-sm text-muted-foreground">
-                <Mail className="size-3.5" /> {profile.email}
+              <h2 className="truncate text-2xl leading-tight sm:text-3xl">{profile.name}</h2>
+              {/* min-w-0 on the text span, not the flex row itself — the row
+                 also holds the Mail icon, and truncate on a flex container
+                 with an icon sibling is silently ignored without this. */}
+              <p className="flex min-w-0 items-center gap-1.5 text-sm text-muted-foreground">
+                <Mail className="size-3.5 shrink-0" />
+                <span className="min-w-0 truncate">{profile.email}</span>
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <RoleBadge role={profile.role} />
