@@ -4,11 +4,11 @@ import { HeartHandshake, ShieldCheck, Sparkles, Ticket } from "lucide-react";
 import { PageHeader } from "@/components/section-heading";
 
 export const metadata: Metadata = {
-  title: "About EventHub — Discover. Experience. Remember.",
+  title: "About Eventora — Discover. Experience. Remember.",
   description:
-    "EventHub is an event discovery and ticketing platform connecting audiences with organizers across the country.",
+    "Eventora is an event discovery and ticketing platform connecting audiences with organizers across the country.",
   openGraph: {
-    title: "About EventHub",
+    title: "About Eventora",
     description: "Why we built an event marketplace worth remembering.",
   },
 };
@@ -23,10 +23,10 @@ const pillars = [
 export default function AboutPage() {
   return (
     <div className="mx-auto w-full max-w-5xl space-y-12 px-4 py-12 sm:px-6 lg:px-8">
-      <PageHeader title="About EventHub" subtitle="Discover. Experience. Remember." />
+      <PageHeader title="About Eventora" subtitle="Discover. Experience. Remember." />
       <div className="space-y-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
         <p>
-          EventHub began as a spreadsheet passed between three friends who kept missing gigs they would have loved.
+          Eventora began as a spreadsheet passed between three friends who kept missing gigs they would have loved.
           Today it is a marketplace where audiences find concerts, conferences, workshops, festivals and matches —
           and where organizers get the tooling to sell out.
         </p>

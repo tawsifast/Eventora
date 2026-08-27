@@ -54,7 +54,7 @@ export function OrdersPage() {
         <PageHeader
           eyebrow="Purchase history"
           title="Your Orders"
-          subtitle={`${loading ? "…" : all.length} orders · ${loading ? "…" : formatCurrency(totalSpent)} spent on EventHub`}
+          subtitle={`${loading ? "…" : all.length} orders · ${loading ? "…" : formatCurrency(totalSpent)} spent on Eventora`}
         />
         <Button asChild variant="outline" className="w-full sm:w-auto shrink-0">
           <Link href="/tickets">Open ticket wallet</Link>

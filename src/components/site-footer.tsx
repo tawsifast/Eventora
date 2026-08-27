@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { EventHubLogo } from "@/components/site-header";
+import { EventoraLogo } from "@/components/site-header";
 import { getCategories } from "@/lib/api";
 import type { Category } from "@/types";
 
@@ -15,9 +15,9 @@ export async function SiteFooter() {
     <footer className="mt-24 border-t border-border bg-card">
       <div className="mx-auto grid w-full max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:grid-cols-2 md:grid-cols-4 lg:px-8">
         <div className="space-y-3">
-          <EventHubLogo />
+          <EventoraLogo />
           <p className="max-w-xs text-sm text-muted-foreground">
-            Discover. Experience. Remember. EventHub brings the country&apos;s best events and your tickets into one
+            Discover. Experience. Remember. Eventora brings the country&apos;s best events and your tickets into one
             place.
           </p>
         </div>
@@ -37,7 +37,7 @@ export async function SiteFooter() {
             </li>
             <li>
               <Link href="/about" className="hover:text-foreground">
-                About EventHub
+                About Eventora
               </Link>
             </li>
           </ul>
@@ -79,7 +79,7 @@ export async function SiteFooter() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
-          <p>© {new Date().getFullYear()} EventHub. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Eventora. All rights reserved.</p>
           <p>Discover. Experience. Remember.</p>
         </div>
       </div>

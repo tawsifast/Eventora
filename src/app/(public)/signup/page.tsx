@@ -64,7 +64,7 @@ export default function SignupPage() {
       return;
     }
 
-    toast.success("Account created. Welcome to EventHub!");
+    toast.success("Account created. Welcome to Eventora!");
     router.push("/");
     router.refresh();
   }

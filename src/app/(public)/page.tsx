@@ -5,11 +5,11 @@ import { getCategories, getEvents } from "@/lib/api";
 import type { Category, Event } from "@/types";
 
 export const metadata: Metadata = {
-  title: "EventHub — Discover Events Worth Remembering",
+  title: "Eventora — Discover Events Worth Remembering",
   description:
-    "Find concerts, conferences, workshops, sports, festivals and experiences happening around you. Buy tickets in seconds on EventHub.",
+    "Find concerts, conferences, workshops, sports, festivals and experiences happening around you. Buy tickets in seconds on Eventora.",
   openGraph: {
-    title: "EventHub — Discover Events Worth Remembering",
+    title: "Eventora — Discover Events Worth Remembering",
     description: "Concerts, conferences, workshops, festivals and experiences near you.",
   },
 };

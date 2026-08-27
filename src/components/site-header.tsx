@@ -27,13 +27,13 @@ const navLinks = [
   { label: "About", to: "/about" },
 ] as const;
 
-export function EventHubLogo({ className }: { className?: string }) {
+export function EventoraLogo({ className }: { className?: string }) {
   return (
     <Link href="/" className={cn("flex items-center gap-2", className)}>
       <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
         <Sparkles className="size-4" />
       </span>
-      <span className="text-lg font-semibold tracking-tight">EventHub</span>
+      <span className="text-lg font-semibold tracking-tight">Eventora</span>
     </Link>
   );
 }
@@ -56,7 +56,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-lg">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
-        <EventHubLogo />
+        <EventoraLogo />
 
         <nav className="ml-6 hidden items-center gap-1 lg:flex">
           {navLinks.map((link) => (
@@ -182,7 +182,7 @@ export function SiteHeader() {
             <SheetContent side="right" className="w-[86vw] max-w-sm p-0">
               <SheetHeader className="border-b border-border p-4">
                 <SheetTitle asChild>
-                  <EventHubLogo />
+                  <EventoraLogo />
                 </SheetTitle>
               </SheetHeader>
               <div className="space-y-6 p-4">

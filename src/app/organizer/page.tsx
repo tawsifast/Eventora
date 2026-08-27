@@ -18,10 +18,10 @@ import { getCurrentUser } from "@/lib/session";
 import type { Event, Order } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Organizer Dashboard — EventHub",
-  description: "Track ticket sales, revenue and attendance across all of your EventHub events.",
+  title: "Organizer Dashboard — Eventora",
+  description: "Track ticket sales, revenue and attendance across all of your Eventora events.",
   openGraph: {
-    title: "Organizer Dashboard — EventHub",
+    title: "Organizer Dashboard — Eventora",
     description: "Your events, sales and attendees at a glance.",
   },
 };

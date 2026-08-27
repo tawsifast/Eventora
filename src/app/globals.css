@@ -4,7 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
- * EventHub design system — "Noir & Gold".
+ * Eventora design system — "Noir & Gold".
  *
  * Dark-first, editorial: near-black warm canvas, champagne gold accent,
  * Instrument Serif display type over Work Sans body copy.
@@ -13,8 +13,8 @@
  */
 
 @theme inline {
-  --font-sans: var(--font-eventhub-sans);
-  --font-display: var(--font-eventhub-display);
+  --font-sans: var(--font-eventora-sans);
+  --font-display: var(--font-eventora-display);
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);

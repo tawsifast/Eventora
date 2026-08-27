@@ -3,10 +3,10 @@ import type { Metadata } from "next";
 import { OrdersPage } from "@/components/pages/orders-page";
 
 export const metadata: Metadata = {
-  title: "Order History — EventHub",
-  description: "Review every EventHub ticket order, payment status and receipt in one place.",
+  title: "Order History — Eventora",
+  description: "Review every Eventora ticket order, payment status and receipt in one place.",
   openGraph: {
-    title: "Order History — EventHub",
+    title: "Order History — Eventora",
     description: "All your ticket purchases and receipts.",
   },
 };

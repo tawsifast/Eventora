@@ -1,5 +1,5 @@
 /**
- * EventHub domain types.
+ * Eventora domain types.
  *
  * These mirror the entities the future Express + Prisma + PostgreSQL backend
  * will expose, so the mock data modules in `src/data` can be swapped for REST

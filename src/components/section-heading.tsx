@@ -47,7 +47,7 @@ export function PageHeader({
     <div className={cn("space-y-5", className)}>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-4 sm:flex sm:flex-wrap sm:justify-between">
         <div className="min-w-0 space-y-2">
-          <p className="eyebrow">{eyebrow ?? "EventHub"}</p>
+          <p className="eyebrow">{eyebrow ?? "Eventora"}</p>
           <h1 className="text-4xl leading-[1.05] sm:text-5xl">{title}</h1>
           {subtitle ? <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">{subtitle}</p> : null}
         </div>

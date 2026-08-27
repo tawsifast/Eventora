@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Access Denied — EventHub",
+  title: "Access Denied — Eventora",
   description: "You don't have permission to view this page.",
 };
 
@@ -19,12 +19,12 @@ export default function UnauthorizedPage() {
       <h1 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">Access denied</h1>
       <p className="mt-3 max-w-md text-sm text-muted-foreground">
         Your account doesn&apos;t have permission to view this page. Sign in with a different account or
-        head back to the EventHub home page.
+        head back to the Eventora home page.
       </p>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Button asChild>
           <Link href="/">
-            <Home className="size-4" /> Back to EventHub
+            <Home className="size-4" /> Back to Eventora
           </Link>
         </Button>
         <Button asChild variant="outline">

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, CalendarPlus, LayoutDashboard, Menu, type LucideIcon } from "lucide-react";
 import { useState, type ReactNode } from "react";
 
-import { EventHubLogo, SiteHeader } from "@/components/site-header";
+import { EventoraLogo, SiteHeader } from "@/components/site-header";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
@@ -75,7 +75,7 @@ export function DashboardShell({
           </div>
           <Button asChild variant="ghost" className="justify-start text-muted-foreground">
             <Link href="/">
-              <ArrowLeft className="size-4" /> Back to EventHub
+              <ArrowLeft className="size-4" /> Back to Eventora
             </Link>
           </Button>
         </aside>
@@ -93,7 +93,7 @@ export function DashboardShell({
               <SheetContent side="left" className="w-[85vw] max-w-72 p-0">
                 <SheetHeader className="border-b border-border p-4">
                   <SheetTitle asChild>
-                    <EventHubLogo />
+                    <EventoraLogo />
                   </SheetTitle>
                 </SheetHeader>
                 <div className="p-4">
@@ -103,7 +103,7 @@ export function DashboardShell({
                   <NavList items={items} onNavigate={() => setOpen(false)} />
                   <Button asChild variant="ghost" className="mt-4 w-full justify-start text-muted-foreground">
                     <Link href="/" onClick={() => setOpen(false)}>
-                      <ArrowLeft className="size-4" /> Back to EventHub
+                      <ArrowLeft className="size-4" /> Back to Eventora
                     </Link>
                   </Button>
                 </div>

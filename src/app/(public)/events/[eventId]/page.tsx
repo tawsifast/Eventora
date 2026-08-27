@@ -17,16 +17,16 @@ export async function generateMetadata({
     event = await getEvent(eventId);
   } catch {
     return {
-      title: "Event not found â€” EventHub",
+      title: "Event not found â€” Eventora",
       robots: { index: false },
     };
   }
 
   return {
-    title: `${event.title} â€” EventHub`,
-    description: `${event.shortDescription} ${event.venue}, ${event.city}. Get your tickets on EventHub.`,
+    title: `${event.title} â€” Eventora`,
+    description: `${event.shortDescription} ${event.venue}, ${event.city}. Get your tickets on Eventora.`,
     openGraph: {
-      title: `${event.title} â€” EventHub`,
+      title: `${event.title} â€” Eventora`,
       description: `${event.venue}, ${event.city}`,
     },
   };

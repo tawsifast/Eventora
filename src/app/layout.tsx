@@ -7,7 +7,7 @@ import "./globals.css";
 
 const workSans = Work_Sans({
   subsets: ["latin"],
-  variable: "--font-eventhub-sans",
+  variable: "--font-eventora-sans",
   display: "swap",
 });
 
@@ -15,18 +15,18 @@ const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
   weight: "400",
   style: ["normal", "italic"],
-  variable: "--font-eventhub-display",
+  variable: "--font-eventora-display",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "EventHub — Discover. Experience. Remember.",
+  title: "Eventora — Discover. Experience. Remember.",
   description:
-    "Discover concerts, conferences, workshops and festivals near you, buy tickets and manage your orders on EventHub.",
+    "Discover concerts, conferences, workshops and festivals near you, buy tickets and manage your orders on Eventora.",
   openGraph: {
-    title: "EventHub — Discover. Experience. Remember.",
+    title: "Eventora — Discover. Experience. Remember.",
     description:
-      "Discover concerts, conferences, workshops and festivals near you, buy tickets and manage your orders on EventHub.",
+      "Discover concerts, conferences, workshops and festivals near you, buy tickets and manage your orders on Eventora.",
     type: "website",
   },
   twitter: {

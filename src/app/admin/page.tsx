@@ -16,10 +16,10 @@ import { getCurrentUser } from "@/lib/session";
 import type { Event, Order, User } from "@/types";
 
 export const metadata: Metadata = {
-  title: "Admin Overview — EventHub",
-  description: "Platform-wide view of events, organizers, ticket volume and revenue on EventHub.",
+  title: "Admin Overview — Eventora",
+  description: "Platform-wide view of events, organizers, ticket volume and revenue on Eventora.",
   openGraph: {
-    title: "Admin Overview — EventHub",
+    title: "Admin Overview — Eventora",
     description: "Moderate events and monitor platform health.",
   },
 };
@@ -59,7 +59,7 @@ export default async function AdminPage() {
         <PageHeader
           eyebrow="Platform"
           title="Admin Overview"
-          subtitle="Events, organizers and ticket volume across EventHub."
+          subtitle="Events, organizers and ticket volume across Eventora."
         />
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
