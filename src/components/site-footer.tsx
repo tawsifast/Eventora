@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Facebook, Instagram, Linkedin } from "lucide-react";
 
 import { EventoraLogo } from "@/components/site-header";
 import { getCategories } from "@/lib/api";
@@ -78,8 +79,34 @@ export async function SiteFooter() {
         </nav>
       </div>
       <div className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-4 py-6 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <p>© {new Date().getFullYear()} Eventora. All rights reserved.</p>
+          <div className="flex items-center gap-3">
+            <Link
+              href="https://www.facebook.com/mdtawsifulislam.islam"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+            >
+              <Facebook className="size-4 transition-colors hover:text-foreground" />
+            </Link>
+            <Link
+              href="https://www.instagram.com/_t_a_w_s_i_f__"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <Instagram className="size-4 transition-colors hover:text-foreground" />
+            </Link>
+            <Link
+              href="https://www.linkedin.com/in/tawsif-islam"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="LinkedIn"
+            >
+              <Linkedin className="size-4 transition-colors hover:text-foreground" />
+            </Link>
+          </div>
           <p>Discover. Experience. Remember.</p>
         </div>
       </div>
